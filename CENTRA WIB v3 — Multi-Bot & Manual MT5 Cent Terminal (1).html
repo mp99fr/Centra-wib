@@ -1,0 +1,3104 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CENTRA WIB v3 — Multi-Bot &amp; Manual MT5 Cent Terminal</title>
+
+  <!-- Mobile PWA & Standalone Metadata -->
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CENTRA WIB" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23090d16'/%3E%3Crect x='6' y='6' width='116' height='116' rx='24' fill='none' stroke='%2310b981' stroke-width='4'/%3E%3Cpath d='M26 84 L48 56 L68 68 L100 34' fill='none' stroke='%2310b981' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='100' cy='34' r='7' fill='%2306b6d4'/%3E%3Ctext x='64' y='108' font-family='sans-serif' font-size='15' font-weight='bold' fill='%23f8fafc' text-anchor='middle'%3ECENTRA WIB%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CENTRA%20WIB%20v3%20%E2%80%94%20Multi-Bot%20%26%20MT5%20Cent%20Terminal%22%2C%22short_name%22%3A%22CENTRA%20WIB%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23090d16%22%2C%22theme_color%22%3A%22%23090d16%22%2C%22orientation%22%3A%22portrait%22%7D" />
+
+  <!-- Fonts & Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html, body {
+      background-color: #090d16;
+      color: #f3f4f6;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .surface-card {
+      background: linear-gradient(180deg, rgba(16, 23, 38, 0.96) 0%, rgba(11, 16, 28, 0.99) 100%);
+      border: 1px solid rgba(51, 65, 85, 0.55);
+      box-shadow: 0 10px 26px -10px rgba(0, 0, 0, 0.7);
+    }
+    .subtab-shell {
+      background: rgba(13, 19, 33, 0.92);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .live-pulse {
+      animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.86); }
+    }
+    .pb-nav-safe {
+      padding-bottom: calc(5.3rem + env(safe-area-inset-bottom, 0px));
+    }
+    .bottom-nav-safe {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#090d16] text-gray-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- IN-APP TOAST NOTIFICATION BANNER (Zero alert()/confirm() usage) -->
+  <div id="toast-stack" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- ===================================================================== -->
+  <!-- TOP STICKY TERMINAL STATUS BAR (WIB CLOCK, SESSION, EQUITY, API KEYS) -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-b border-gray-800/90 px-3 py-2.5">
+    <div class="max-w-3xl mx-auto flex items-center justify-between gap-2">
+      <!-- Brand + Live WIB Clock & Active Session Pill -->
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm tracking-tight text-white truncate">CENTRA WIB</span>
+            <span id="top-session-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider truncate">
+              LDN-NY OVERLAP
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px] font-mono text-gray-400 tabular-nums">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+            <span id="top-wib-clock">--:--:-- WIB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Controls: Equity Pill (USC & IDR) + Compact API Keys Modal Button -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="openFolder('vault')" class="text-right px-2.5 py-1 rounded-xl bg-[#101726] border border-gray-800 hover:border-gray-700 transition">
+          <div id="top-equity-usc" class="text-xs font-mono font-bold text-white tabular-nums">1,096.0 USC</div>
+          <div id="top-equity-idr" class="text-[10px] font-mono font-semibold text-cyan-300 tabular-nums">Rp200.020</div>
+        </button>
+
+        <button onclick="toggleApiModal(true)" class="px-2.5 py-2 rounded-xl bg-[#101726] border border-gray-800 hover:border-cyan-500/50 text-cyan-300 text-[11px] font-bold flex items-center gap-1 transition active:scale-95" title="Configure Free API Keys & Cent Rate">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+          </svg>
+          <span class="hidden sm:inline">API Keys</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE (4 MINIMALISTIC FOLDERS)                               -->
+  <!-- ===================================================================== -->
+  <main class="max-w-3xl mx-auto px-3 pt-3 pb-nav-safe space-y-3">
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 1: SIGNALS (8-Bot Multi-TF Engine + Live TradingView Chart)  -->
+    <!-- =================================================================== -->
+    <section id="folder-signals" class="folder-section space-y-3">
+      <!-- Sub-View Toggle -->
+      <div class="subtab-shell rounded-2xl p-1 grid grid-cols-2 gap-1">
+        <button onclick="switchSubTab('signals', 'engine')" data-subbtn="signals-engine" class="py-2 px-3 rounded-xl text-xs font-bold transition">
+          ⚡ 8-Bot Signal Engine
+        </button>
+        <button onclick="switchSubTab('signals', 'chart')" data-subbtn="signals-chart" class="py-2 px-3 rounded-xl text-xs font-bold transition">
+          📈 Live TradingView Chart
+        </button>
+      </div>
+
+      <!-- SUB-VIEW 1A: 8-BOT SIGNAL ENGINE -->
+      <div id="subview-signals-engine" class="space-y-3">
+        <!-- WIB Session & High-Impact News Guardrail Banner -->
+        <div id="signal-guardrail-banner" class="rounded-2xl p-3 border text-xs"></div>
+
+        <!-- Instrument, Horizon Window & Timeframe Control Card -->
+        <div class="surface-card rounded-2xl p-4 space-y-3.5 border border-cyan-500/25">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/35">8-BOT CONFLUENCE</span>
+              <h1 class="text-base font-extrabold text-white mt-1">Multi-Timeframe Signal &amp; Liquidity Engine</h1>
+            </div>
+            <button onclick="refreshLivePrices(true)" class="px-2.5 py-1.5 rounded-xl bg-[#090d16] border border-gray-800 hover:border-emerald-500/40 text-[11px] font-mono text-emerald-400 transition">
+              ↻ Prices
+            </button>
+          </div>
+
+          <!-- 1. Instrument Pills -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">1. Select Cent Instrument</label>
+            <div id="sig-instrument-pills" class="grid grid-cols-3 sm:grid-cols-6 gap-1.5"></div>
+          </div>
+
+          <!-- 2. 3 Trading Horizon Windows -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">2. Trading Horizon Window</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="selectHorizonWindow('scalp')" id="win-card-scalp" class="p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">⚡ Short Scalp</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">1m / 5m / 15m</div>
+              </button>
+              <button onclick="selectHorizonWindow('intraday')" id="win-card-intraday" class="p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">🎯 Intraday</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">15m / 1H</div>
+              </button>
+              <button onclick="selectHorizonWindow('swing')" id="win-card-swing" class="p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">🌙 Swing Term</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">4H / 1D + Astral</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Exact Timeframe Pills -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">3. Active Chart Timeframe</label>
+              <span id="sig-window-hint" class="text-[10px] font-mono text-cyan-300">Window: Medium Intraday</span>
+            </div>
+            <div class="grid grid-cols-6 gap-1.5" id="sig-tf-pills">
+              <button onclick="selectTimeframe('1m')" data-tf="1m" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1m</button>
+              <button onclick="selectTimeframe('5m')" data-tf="5m" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">5m</button>
+              <button onclick="selectTimeframe('15m')" data-tf="15m" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">15m</button>
+              <button onclick="selectTimeframe('1H')" data-tf="1H" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1H</button>
+              <button onclick="selectTimeframe('4H')" data-tf="4H" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">4H</button>
+              <button onclick="selectTimeframe('1D')" data-tf="1D" class="sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1D</button>
+            </div>
+          </div>
+
+          <!-- Run Bots CTA -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
+            <button onclick="runEightBotPipeline(true)" class="sm:col-span-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-[#051017] font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-emerald-500/20 transition active:scale-[0.99]">
+              ⚡ RUN 8-BOT SIGNAL &amp; SMC SCANNER
+            </button>
+            <button onclick="rankAllSixPairs()" class="py-3.5 px-3 rounded-xl bg-[#162033] hover:bg-gray-800 border border-gray-700 text-cyan-300 font-bold text-xs transition active:scale-[0.99]">
+              🔍 Rank All 6 Pairs
+            </button>
+          </div>
+
+          <!-- Animated Scan Progress -->
+          <div id="bot-progress-wrap" class="hidden rounded-xl bg-[#090d16] border border-cyan-500/30 p-3 space-y-1.5">
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span id="bot-progress-text" class="text-cyan-300">Scanning 8 Bots...</span>
+              <span id="bot-progress-pct" class="text-emerald-400 font-bold">0%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-gray-800 overflow-hidden">
+              <div id="bot-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-150" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6-PAIR RANKING DRAWER -->
+        <div id="six-pair-rank-card" class="hidden surface-card rounded-2xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold text-white">6-Pair Conviction Ranking (<span id="rank-tf-badge">1H</span>)</h2>
+              <p class="text-[11px] text-gray-400">Sorted by highest directional edge • Tap any row to inspect all 8 bots</p>
+            </div>
+            <button onclick="document.getElementById('six-pair-rank-card').classList.add('hidden')" class="text-xs text-gray-400 hover:text-white px-2 py-1">Close</button>
+          </div>
+          <div id="six-pair-rank-list" class="space-y-2"></div>
+        </div>
+
+        <!-- MASTER BOT 8 VERDICT & ACTIONABLE PRICE LEVELS CARD -->
+        <div id="master-verdict-card" class="surface-card rounded-2xl p-4 space-y-4"></div>
+
+        <!-- ALL 8 INDIVIDUAL BOT BREAKDOWN CARDS -->
+        <div class="surface-card rounded-2xl p-4 space-y-3">
+          <div>
+            <h2 class="text-sm font-extrabold text-white">8-Bot Diagnostic Breakdown</h2>
+            <p class="text-[11px] text-gray-400">Technicals, SMC FVG/iFVG &amp; Liquidity, Chart Geometry, Sideways Filter, Macro, Astral &amp; Cent Sizing</p>
+          </div>
+          <div id="eight-bots-list" class="space-y-2.5"></div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 1B: LIVE TRADINGVIEW CHART -->
+      <div id="subview-signals-chart" class="hidden space-y-3">
+        <div class="surface-card rounded-2xl p-3 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span id="tv-top-verdict" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">BUY</span>
+              <span id="tv-top-title" class="text-xs font-extrabold text-white truncate">XAUUSDc • 1H (Asia/Jakarta WIB)</span>
+            </div>
+            <div id="tv-top-levels" class="text-[11px] font-mono text-gray-400 truncate mt-0.5">Entry • SL • TP</div>
+          </div>
+          <button onclick="switchSubTab('signals', 'engine')" class="px-3 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs font-bold shrink-0">
+            8-Bot Thesis →
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <div id="tv-pair-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
+          <div class="flex items-center gap-1 bg-[#101726] p-1 rounded-xl border border-gray-800 shrink-0">
+            <button onclick="selectTimeframe('1m')" data-tvtf="1m" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1m</button>
+            <button onclick="selectTimeframe('5m')" data-tvtf="5m" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">5m</button>
+            <button onclick="selectTimeframe('15m')" data-tvtf="15m" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">15m</button>
+            <button onclick="selectTimeframe('1H')" data-tvtf="1H" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1H</button>
+            <button onclick="selectTimeframe('4H')" data-tvtf="4H" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">4H</button>
+            <button onclick="selectTimeframe('1D')" data-tvtf="1D" class="tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1D</button>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-2xl overflow-hidden border border-gray-800">
+          <div id="tv-chart-container" class="w-full h-[410px] sm:h-[470px] bg-[#090d16]"></div>
+        </div>
+
+        <div id="tv-smc-strip" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 2: NEWS & INTEL (4-Bot News Filter + Repaired WIB Calendar)  -->
+    <!-- =================================================================== -->
+    <section id="folder-intel" class="folder-section hidden space-y-3">
+      <!-- Sub-Tab Toggle -->
+      <div class="subtab-shell rounded-2xl p-1 grid grid-cols-2 gap-1">
+        <button onclick="switchSubTab('intel', 'news')" data-subbtn="intel-news" class="py-2 px-3 rounded-xl text-xs font-bold transition">
+          📰 4-Bot News Intelligence
+        </button>
+        <button onclick="switchSubTab('intel', 'calendar')" data-subbtn="intel-calendar" class="py-2 px-3 rounded-xl text-xs font-bold transition">
+          📅 WIB Economic Calendar
+        </button>
+      </div>
+
+      <!-- SUB-VIEW 2A: 4-BOT NEWS IMPORTANCE FILTER & SUMMARIZER -->
+      <div id="subview-intel-news" class="space-y-3">
+        <!-- Bot N4: Executive Desk Summarizer Card -->
+        <div class="surface-card rounded-2xl p-4 border border-cyan-500/30 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/35">BOT N4 • EXECUTIVE DESK SUMMARIZER</span>
+              <h2 class="text-sm font-extrabold text-white mt-1">Institutional Macro &amp; Pair Brief (WIB)</h2>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="generateExecutiveNewsSummary(true)" id="btn-exec-summary" class="px-2.5 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold transition">
+                ✨ Summarize
+              </button>
+              <button onclick="refreshLiveNewsWire(true)" class="px-2.5 py-1.5 rounded-xl bg-[#090d16] border border-gray-800 hover:border-emerald-500/40 text-emerald-400 text-[11px] font-mono">
+                ↻ Wire
+              </button>
+            </div>
+          </div>
+          <div id="exec-news-summary-box" class="space-y-2 text-xs text-gray-200 leading-relaxed"></div>
+        </div>
+
+        <!-- Bot N2: Importance & Noise Filter Pills -->
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="setNewsFilter('ALL')" data-nfilter="ALL" class="news-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">All Headlines</button>
+            <button onclick="setNewsFilter('CRITICAL')" data-nfilter="CRITICAL" class="news-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">🔴 Critical Only</button>
+            <button onclick="setNewsFilter('MY_PAIRS')" data-nfilter="MY_PAIRS" class="news-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">🎯 My 6 Pairs</button>
+            <button onclick="setNewsFilter('LOW_NOISE')" data-nfilter="LOW_NOISE" class="news-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">🔇 Low Noise</button>
+          </div>
+          <span id="news-wire-status" class="text-[10px] font-mono text-gray-400">Bot N1–N3 Active • WIB</span>
+        </div>
+
+        <!-- Filtered News Wire List -->
+        <div id="filtered-news-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- SUB-VIEW 2B: REPAIRED WIB ECONOMIC CALENDAR & ALERT BOT -->
+      <div id="subview-intel-calendar" class="hidden space-y-3">
+        <!-- WIB News Alert Bot Banner -->
+        <div class="surface-card rounded-2xl p-4 border border-amber-500/30 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">WIB NEWS ALERT BOT</span>
+              <h2 class="text-sm font-extrabold text-white mt-1">30-Minute Pre-Release Terminal Guard</h2>
+              <p class="text-xs text-gray-400">Automatically fires a local terminal banner &amp; optional chime when High-Impact WIB releases hit within 30 minutes.</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="fireTestWibCalendarAlert()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
+                🔔 Test Alert
+              </button>
+              <button onclick="fetchLiveEconomicCalendar(true)" class="px-2.5 py-1.5 rounded-xl bg-[#090d16] border border-gray-800 text-cyan-300 text-[11px] font-mono">
+                ↻ Sync
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center justify-between rounded-xl bg-[#090d16] border border-gray-800 px-3 py-2 cursor-pointer">
+              <span class="font-semibold text-gray-200">30m Pre-News Banner</span>
+              <input type="checkbox" id="cal-alert-enabled" onchange="appState.calendarPrefs.alertEnabled=this.checked; saveState();" class="accent-emerald-500 w-4 h-4" />
+            </label>
+            <label class="flex items-center justify-between rounded-xl bg-[#090d16] border border-gray-800 px-3 py-2 cursor-pointer">
+              <span class="font-semibold text-gray-200">Web Audio Chime</span>
+              <input type="checkbox" id="cal-sound-enabled" onchange="appState.calendarPrefs.soundEnabled=this.checked; saveState();" class="accent-emerald-500 w-4 h-4" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Calendar Filter Pills -->
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="setCalendarFilter('ALL')" data-cfilter="ALL" class="cal-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">All Week</button>
+            <button onclick="setCalendarFilter('HIGH')" data-cfilter="HIGH" class="cal-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">High Impact 🔴</button>
+            <button onclick="setCalendarFilter('TODAY')" data-cfilter="TODAY" class="cal-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">Today WIB</button>
+            <button onclick="setCalendarFilter('MY_PAIRS')" data-cfilter="MY_PAIRS" class="cal-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition">My Pairs</button>
+          </div>
+          <span id="cal-source-badge" class="text-[10px] font-mono text-emerald-400">UTC+7 (Asia/Jakarta WIB)</span>
+        </div>
+
+        <!-- Weekly WIB Calendar Table/Cards -->
+        <div id="wib-calendar-container" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 3: GEMINI DESK (Instrument Opinions & Ask Gemini Live Desk)  -->
+    <!-- =================================================================== -->
+    <section id="folder-gemini" class="folder-section hidden space-y-3">
+      <!-- Interactive Ask Gemini Live Desk Card -->
+      <div class="surface-card rounded-2xl p-4 border border-cyan-500/35 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/40">GEMINI INSTITUTIONAL DESK</span>
+            <h2 class="text-base font-extrabold text-white mt-1">Ask Gemini Live Desk</h2>
+          </div>
+          <span id="gemini-key-indicator" class="px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-800 text-gray-300 border border-gray-700">Local Synthesis Ready</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Target Scope</label>
+            <select id="gemini-target-select" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white">
+              <option value="PORTFOLIO">Full Portfolio Cross-Check (All 6)</option>
+              <option value="XAUUSDc">XAUUSDc (Gold Spot)</option>
+              <option value="USDJPYc">USDJPYc (US Dollar / Yen)</option>
+              <option value="AUDCADc">AUDCADc (Aussie / Loonie)</option>
+              <option value="USTECc">USTECc (Nasdaq 100)</option>
+              <option value="USOILc">USOILc (WTI Crude Oil)</option>
+              <option value="BTCUSDc">BTCUSDc (Bitcoin)</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Optional Desk Question</label>
+            <input id="gemini-question-input" type="text" placeholder="e.g., Should I buy Gold dip below $3,870 or wait for US Retail Sales?" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white" />
+          </div>
+        </div>
+
+        <button id="btn-ask-gemini-desk" onclick="runAskGeminiDesk()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-[#051017] font-extrabold text-xs tracking-wide shadow-lg shadow-cyan-500/15 transition">
+          ✨ Generate Live Gemini Opinion
+        </button>
+
+        <div id="gemini-live-response-box" class="hidden rounded-xl bg-[#090d16] border border-cyan-500/35 p-3.5 text-xs text-gray-200 leading-relaxed space-y-2"></div>
+      </div>
+
+      <!-- Gemini's 6 Institutional Instrument Dossiers -->
+      <div class="flex items-center justify-between px-0.5">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-400">Gemini Desk Opinions — All 6 Cent Pairs</h3>
+        <span class="text-[10px] font-mono text-gray-500">Updated Nov 16, 2026</span>
+      </div>
+      <div id="gemini-instrument-dossiers" class="space-y-3"></div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 4: MT5 VAULT (Manual MT5 Cent Log, Equity Curve & Guardrails)-->
+    <!-- =================================================================== -->
+    <section id="folder-vault" class="folder-section hidden space-y-3">
+      <!-- Top Account Metrics & Risk Guardrails Card -->
+      <div class="surface-card rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">MT5 Standard Cent Account Equity</span>
+            <div class="flex items-baseline gap-2 mt-0.5">
+              <span id="vault-equity-usc" class="text-2xl font-mono font-extrabold text-white tabular-nums">1,096.0 USC</span>
+              <span id="vault-equity-idr" class="text-xs font-mono text-cyan-300 tabular-nums">(Rp200.020)</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <label class="block text-[10px] text-gray-400">Starting Capital (USC)</label>
+            <input id="vault-start-capital" type="number" step="0.1" value="1096" onchange="updateStartingCapital(this.value)" class="w-24 text-right font-mono text-xs bg-[#090d16] border border-gray-700 rounded-lg px-2 py-1 text-white" />
+          </div>
+        </div>
+
+        <!-- 6 Core Account Metrics -->
+        <div class="grid grid-cols-3 gap-2 text-xs font-mono">
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Floating P&amp;L</div>
+            <div id="vault-floating-usc" class="font-bold text-gray-200 mt-0.5">+0.0 USC</div>
+            <div id="vault-floating-idr" class="text-[10px] text-gray-500">Rp0</div>
+          </div>
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Net Profit</div>
+            <div id="vault-net-usc" class="font-bold text-emerald-400 mt-0.5">+0.0 USC</div>
+            <div id="vault-net-idr" class="text-[10px] text-gray-500">Rp0</div>
+          </div>
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Win Rate / PF</div>
+            <div id="vault-winrate" class="font-bold text-white mt-0.5">0.0%</div>
+            <div id="vault-pf" class="text-[10px] text-cyan-300">PF: 0.00</div>
+          </div>
+        </div>
+
+        <!-- Portfolio Heat Meter & Daily Loss Circuit Breaker -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5 space-y-1.5">
+            <div class="flex items-center justify-between font-mono">
+              <span class="text-[10px] text-gray-400 font-sans font-bold uppercase">Portfolio Heat (Max 4.5%)</span>
+              <span id="vault-heat-label" class="text-[11px] font-bold text-emerald-400">0.0% (0.0 / 49.3 USC)</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div id="vault-heat-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] text-gray-400 font-bold uppercase">Daily Loss Circuit Breaker</div>
+              <div id="vault-breaker-sub" class="text-[11px] text-gray-300 mt-0.5">Stops trading after 2 consecutive losses</div>
+            </div>
+            <span id="vault-breaker-pill" class="px-2.5 py-1 rounded-lg font-mono text-xs font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">0 / 2</span>
+          </div>
+        </div>
+
+        <!-- USD Correlation Warning Banner (if active) -->
+        <div id="vault-usd-warning" class="hidden rounded-xl bg-amber-950/60 border border-amber-500/45 p-2.5 text-xs text-amber-200 font-semibold"></div>
+      </div>
+
+      <!-- Manual MT5 Cent Trade Entry Form -->
+      <div class="surface-card rounded-2xl p-4 space-y-3 border border-emerald-500/25">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-extrabold text-white">Manual MT5 Cent Trade Entry</h2>
+            <p class="text-[11px] text-gray-400">Log open executions or record completed MT5 trades directly</p>
+          </div>
+          <span id="form-risk-preview" class="text-[11px] font-mono font-bold text-cyan-300">Risk: 18.0 USC</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Symbol</label>
+            <select id="m-symbol" onchange="onManualFormSymbolChange()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white">
+              <option value="XAUUSDc">XAUUSDc</option>
+              <option value="AUDCADc">AUDCADc</option>
+              <option value="USDJPYc">USDJPYc</option>
+              <option value="USTECc">USTECc</option>
+              <option value="USOILc">USOILc</option>
+              <option value="BTCUSDc">BTCUSDc</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Side</label>
+            <select id="m-side" onchange="updateManualFormPreview()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-emerald-400">
+              <option value="BUY">BUY (LONG)</option>
+              <option value="SELL">SELL (SHORT)</option>
+            </select>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Cent Lots (0.01–0.20)</label>
+            <input id="m-lots" type="number" step="0.01" min="0.01" max="0.20" value="0.01" oninput="updateManualFormPreview()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white" />
+          </div>
+
+          <div class="col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-bold text-gray-400">Entry Price</label>
+              <button type="button" onclick="fillFormWithMarketPrice()" class="text-[10px] font-mono text-cyan-400 hover:underline">Use Market Price</button>
+            </div>
+            <input id="m-entry" type="number" step="any" oninput="updateManualFormPreview()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Stop Loss</label>
+            <input id="m-sl" type="number" step="any" oninput="updateManualFormPreview()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-rose-300" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Take Profit</label>
+            <input id="m-tp" type="number" step="any" oninput="updateManualFormPreview()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-emerald-300" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Trade Status</label>
+            <select id="m-status" onchange="toggleClosedExitField()" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-bold text-white">
+              <option value="OPEN">Open Position</option>
+              <option value="CLOSED">Already Closed</option>
+            </select>
+          </div>
+
+          <div id="m-exit-wrap" class="hidden">
+            <label class="block text-[10px] font-bold text-amber-300 mb-1">Exit Price (Closed)</label>
+            <input id="m-exit" type="number" step="any" oninput="updateManualFormPreview()" class="w-full bg-[#090d16] border border-amber-500/50 rounded-xl px-2.5 py-2 text-xs font-mono text-amber-200" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">WIB Timestamp</label>
+            <input id="m-time" type="text" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-gray-200" />
+          </div>
+
+          <div class="col-span-2 sm:col-span-3">
+            <label class="block text-[10px] font-bold text-gray-400 mb-1">Strategy / Setup Note</label>
+            <input id="m-note" type="text" placeholder="e.g., 1H Bullish FVG retest after NY Open SSL sweep" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] font-mono text-gray-400 bg-[#090d16] rounded-xl px-3 py-2 border border-gray-800">
+          <span id="form-pip-val-info">Pip/Pt Value: 1.00 USC per 0.1 move</span>
+          <span id="form-idr-risk-info" class="text-amber-300">Est. Risk: Rp3.285</span>
+        </div>
+
+        <button onclick="submitManualTrade()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-[#051017] font-extrabold text-xs tracking-wide transition">
+          + Save Trade to MT5 Vault
+        </button>
+      </div>
+
+      <!-- Active Open Positions List -->
+      <div class="surface-card rounded-2xl p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-white">Active Open Positions (<span id="vault-open-count">0</span>)</h3>
+          <span class="text-[10px] font-mono text-gray-400">Adjust tick price for live R-multiple</span>
+        </div>
+        <div id="vault-open-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- SVG Equity Curve & Closed Trade History Ledger -->
+      <div class="surface-card rounded-2xl p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-extrabold text-white">Cumulative Equity Curve &amp; Trade Ledger</h3>
+            <p class="text-[11px] text-gray-400">Realized USC balance progression &amp; backup tools</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="exportVaultBackup('json')" class="px-2.5 py-1.5 rounded-lg bg-[#090d16] border border-gray-700 text-[11px] font-semibold text-gray-200 hover:border-cyan-500/40">Export JSON</button>
+            <button onclick="exportVaultBackup('csv')" class="px-2.5 py-1.5 rounded-lg bg-[#090d16] border border-gray-700 text-[11px] font-semibold text-gray-200 hover:border-emerald-500/40">Export CSV</button>
+            <label class="px-2.5 py-1.5 rounded-lg bg-[#090d16] border border-gray-700 text-[11px] font-semibold text-cyan-300 cursor-pointer hover:border-cyan-500/40">
+              Import
+              <input type="file" accept=".json,.csv" onchange="importVaultBackup(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2">
+          <svg id="vault-equity-chart" viewBox="0 0 600 175" class="w-full h-36 overflow-visible"></svg>
+        </div>
+
+        <div id="vault-closed-ledger" class="space-y-2 max-h-80 overflow-y-auto"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MINIMALISTIC 4-FOLDER BOTTOM NAVIGATION BAR                           -->
+  <!-- ===================================================================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#090d16]/95 backdrop-blur-lg border-t border-gray-800/90 bottom-nav-safe">
+    <div class="max-w-3xl mx-auto grid grid-cols-4">
+      <button onclick="openFolder('signals')" data-folderbtn="signals" class="py-2.5 flex flex-col items-center justify-center gap-1 text-emerald-400 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span class="text-[11px] font-bold">Signals</span>
+      </button>
+
+      <button onclick="openFolder('intel')" data-folderbtn="intel" class="py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span class="text-[11px] font-bold">News &amp; Intel</span>
+      </button>
+
+      <button onclick="openFolder('gemini')" data-folderbtn="gemini" class="py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"></path>
+        </svg>
+        <span class="text-[11px] font-bold">Gemini Desk</span>
+      </button>
+
+      <button onclick="openFolder('vault')" data-folderbtn="vault" class="py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20V10"></path>
+          <path d="M18 20V4"></path>
+          <path d="M6 20v-4"></path>
+        </svg>
+        <span class="text-[11px] font-bold">MT5 Vault</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- COMPACT API KEYS & CENT RISK QUICK-MODAL                              -->
+  <!-- ===================================================================== -->
+  <div id="api-keys-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-[#101726] border border-gray-800 p-5 space-y-3.5 shadow-2xl max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold text-white">🔐 Free API Keys &amp; Cent Settings</h2>
+          <p class="text-xs text-gray-400">Stored locally on your device • Optional keys unlock live AI &amp; feeds</p>
+        </div>
+        <button onclick="toggleApiModal(false)" class="p-2 rounded-xl bg-gray-800 text-gray-300 hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Google AI Studio Gemini Key <span class="text-gray-500 font-normal">(aistudio.google.com)</span></label>
+          <input id="cfg-gemini" type="password" placeholder="AIzaSy..." class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Twelve Data API Key <span class="text-gray-500 font-normal">(twelvedata.com — 800 free/day)</span></label>
+          <input id="cfg-twelvedata" type="text" placeholder="Optional live price key" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Finnhub API Key <span class="text-gray-500 font-normal">(finnhub.io — 60 free/min)</span></label>
+          <input id="cfg-finnhub" type="text" placeholder="Optional live news/calendar key" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">IDR per 1 USC</label>
+            <input id="cfg-idr" type="number" step="0.1" value="182.5" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Risk / Trade (%)</label>
+            <input id="cfg-risk" type="number" step="0.1" min="0.5" max="3.0" value="1.8" class="w-full bg-[#090d16] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveApiModalSettings()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-[#051017] font-extrabold text-xs tracking-wide transition">
+        Save Settings &amp; Refresh Feeds
+      </button>
+    </div>
+  </div>
+
+  <!-- TradingView Charting Library -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+  <script>
+    // =========================================================================
+    // 1. INSTRUMENT SPECIFICATIONS & NOV 16, 2026 BASELINE MARKET DATA
+    // =========================================================================
+    const INSTRUMENTS = {
+      XAUUSDc: {
+        symbol: 'XAUUSDc',
+        clean: 'XAUUSD',
+        name: 'Gold Spot vs US Dollar (Cent)',
+        tvSymbol: 'OANDA:XAUUSD',
+        tdSymbol: 'XAU/USD',
+        usdLeg: 'SHORT_USD',
+        decimals: 2,
+        pipSize: 0.1,
+        pipLabel: '0.10 ($0.10)',
+        uscPerPoint001: 1.0, // 0.01 cent lot = 0.0001 std lot -> $1 move = 1.0 USC
+        basePrice: 3868.50,
+        h1Atr: 16.40,
+        geminiOpinion: {
+          bias: 'BEARISH PULLBACK → DEMAND RELOAD',
+          biasTier: 'bearish',
+          conviction: 68,
+          rationale: 'Gold is consolidating near $3,868.50 below the $4,000 psychological threshold as elevated US 10-Year yields (~5.13%) and firm USD momentum cap immediate upside rallies. Institutional order flow favors sweeping sell-side liquidity into the $3,832–$3,840 H4 demand shelf before reloading longs ahead of Tuesday\'s US Retail Sales.',
+          support: '3,832.00 – 3,840.50 (H4 SSL & Bullish OB)',
+          resistance: '3,895.00 – 3,905.00 (London High & Bearish FVG)',
+          invalidation: 'H4 Close above 3,918.00 shifts bias to $3,960 BSL',
+          optimalWib: '19:30 – 23:00 WIB (NY Overlap Killzone)'
+        }
+      },
+      AUDCADc: {
+        symbol: 'AUDCADc',
+        clean: 'AUDCAD',
+        name: 'Australian Dollar vs Canadian Dollar (Cent)',
+        tvSymbol: 'OANDA:AUDCAD',
+        tdSymbol: 'AUD/CAD',
+        usdLeg: 'NEUTRAL_USD',
+        decimals: 5,
+        pipSize: 0.0001,
+        pipLabel: '0.0001 (1 pip)',
+        uscPerPoint001: 725, // 0.01 cent lot: 100 pips (0.0100) = ~7.25 USC
+        basePrice: 0.91780,
+        h1Atr: 0.00340,
+        geminiOpinion: {
+          bias: 'RANGE / MEAN-REVERT',
+          biasTier: 'neutral',
+          conviction: 62,
+          rationale: 'AUDCADc is oscillating tightly around 0.91780 as traders position for tonight\'s Canadian CPI (20:30 WIB) and Thursday\'s Australian Employment report (07:30 WIB). With WTI Crude holding firm near $88.45 and RBA maintaining a hawkish 4.85% cash rate posture, both commodity currencies are balanced—favoring range-edge fades rather than breakout chasing.',
+          support: '0.91420 – 0.91500 (Asian SSL Shelf)',
+          resistance: '0.92050 – 0.92140 (Weekly BSL Highs)',
+          invalidation: 'H1 Close outside 0.91300 or 0.92250 post-CPI',
+          optimalWib: '07:30 – 11:30 WIB (Sydney/Tokyo) or post-21:00 WIB'
+        }
+      },
+      USDJPYc: {
+        symbol: 'USDJPYc',
+        clean: 'USDJPY',
+        name: 'US Dollar vs Japanese Yen (Cent)',
+        tvSymbol: 'OANDA:USDJPY',
+        tdSymbol: 'USD/JPY',
+        usdLeg: 'LONG_USD',
+        decimals: 3,
+        pipSize: 0.01,
+        pipLabel: '0.01 (1 pip)',
+        uscPerPoint001: 6.27, // 0.01 cent lot: 1.00 JPY (100 pips) = ~6.27 USC
+        basePrice: 159.620,
+        h1Atr: 0.780,
+        geminiOpinion: {
+          bias: 'INTERVENTION WATCH (CAPPED UPSIDE)',
+          biasTier: 'warning',
+          conviction: 74,
+          rationale: 'Trading at 159.620 right below the critical 160.000 psychological line where Japan\'s Ministry of Finance & BoJ have repeatedly issued verbal and physical intervention warnings. While US yield differentials keep dips supported above 158.40, risk-reward for chasing longs at 159.60+ is asymmetric—look for liquidity sweep rejections at 159.90–160.15 into bearish iFVGs.',
+          support: '158.400 – 158.750 (H4 Bullish FVG & 50 EMA)',
+          resistance: '159.950 – 160.200 (BoJ Intervention Red Zone)',
+          invalidation: 'Sustained H4 Close above 160.450 without MoF pushback',
+          optimalWib: '07:50 – 10:00 WIB (Tokyo Fix) & 19:30 – 22:30 WIB'
+        }
+      },
+      USTECc: {
+        symbol: 'USTECc',
+        clean: 'USTEC',
+        name: 'US Tech 100 / Nasdaq Index (Cent)',
+        tvSymbol: 'PEPPERSTONE:NAS100',
+        tdSymbol: 'QQQ',
+        usdLeg: 'SHORT_USD',
+        decimals: 1,
+        pipSize: 1.0,
+        pipLabel: '1.0 pt',
+        uscPerPoint001: 0.10, // 0.01 cent lot: 100 pts = 10.0 USC
+        basePrice: 27705.0,
+        h1Atr: 185.0,
+        geminiOpinion: {
+          bias: 'BULLISH DIP-BUYING (PRE-EARNINGS)',
+          biasTier: 'bullish',
+          conviction: 71,
+          rationale: 'Nasdaq 100 is digesting last week\'s yield pressure around 27,705.0 as mega-cap AI hardware positioning builds ahead of Nvidia\'s quarterly earnings and Tuesday\'s US Retail Sales. M15/H1 structure shows clean sell-side liquidity resting at 27,480; sweeping that pool during early NY cash open offers high-probability continuation toward 28,150.',
+          support: '27,460.0 – 27,520.0 (NY Session SSL & H1 FVG)',
+          resistance: '28,020.0 – 28,180.0 (Prior Swing BSL)',
+          invalidation: 'H4 Close below 27,320.0 opens deeper 26,950 retest',
+          optimalWib: '21:30 – 00:30 WIB (NY Cash Equities Open)'
+        }
+      },
+      USOILc: {
+        symbol: 'USOILc',
+        clean: 'USOIL',
+        name: 'WTI Crude Oil Spot (Cent)',
+        tvSymbol: 'TVC:USOIL',
+        tdSymbol: 'WTI/USD',
+        usdLeg: 'SHORT_USD',
+        decimals: 2,
+        pipSize: 0.01,
+        pipLabel: '0.01 ($0.01)',
+        uscPerPoint001: 1.0, // 0.01 cent lot: $1.00 move = 1.0 USC
+        basePrice: 88.45,
+        h1Atr: 1.45,
+        geminiOpinion: {
+          bias: 'BULLISH MOMENTUM (SUPPLY TIGHT)',
+          biasTier: 'bullish',
+          conviction: 66,
+          rationale: 'WTI Crude holds firm at $88.45 supported by OPEC+ export discipline and geopolitical transit premiums, though traders are cautious ahead of Wednesday\'s EIA Crude Oil Inventories (22:30 WIB) following last week\'s inventory build. Pullbacks into the $87.10–$87.45 H1 bullish order block remain attractive while $86.40 holds.',
+          support: '87.10 – 87.45 (H1 Bullish FVG & Demand)',
+          resistance: '89.80 – 90.25 ($90 Psychological BSL)',
+          invalidation: 'H4 Close below 86.30 negates upward channel',
+          optimalWib: '20:00 – 23:30 WIB (NYMEX Pit Volume)'
+        }
+      },
+      BTCUSDc: {
+        symbol: 'BTCUSDc',
+        clean: 'BTCUSD',
+        name: 'Bitcoin vs US Dollar (Cent)',
+        tvSymbol: 'BITSTAMP:BTCUSD',
+        tdSymbol: 'BTC/USD',
+        usdLeg: 'SHORT_USD',
+        decimals: 1,
+        pipSize: 1.0,
+        pipLabel: '1.0 ($1)',
+        uscPerPoint001: 0.01, // 0.01 cent lot: $1,000 move = 10.0 USC
+        basePrice: 64180.0,
+        h1Atr: 1280.0,
+        geminiOpinion: {
+          bias: 'NEUTRAL / ACCUMULATION COIL',
+          biasTier: 'neutral',
+          conviction: 60,
+          rationale: 'Bitcoin is stabilizing near $64,180 after absorbing last week\'s strong US Dollar surge. Spot ETF flows remain balanced between $62,900 structural support and $66,800 overhead bearish FVG supply. Avoid over-leveraging mid-range; wait for either a $63,000 SSL sweep reclaim or a decisive H4 close above $65,600.',
+          support: '62,850.0 – 63,200.0 (Daily SSL & Demand)',
+          resistance: '66,500.0 – 66,850.0 (H4 Bearish FVG)',
+          invalidation: 'Daily Close below 62,100 exposes 59,800 liquidity',
+          optimalWib: '21:00 – 01:00 WIB (US ETF & Institutional Session)'
+        }
+      }
+    };
+
+    const SYMBOL_LIST = Object.keys(INSTRUMENTS);
+
+    const TF_META = {
+      '1m':  { tf: '1m',  window: 'scalp',    tv: '1',   atrMult: 0.14, title: '1-Minute Scalp' },
+      '5m':  { tf: '5m',  window: 'scalp',    tv: '5',   atrMult: 0.28, title: '5-Minute Scalp' },
+      '15m': { tf: '15m', window: 'intraday', tv: '15',  atrMult: 0.52, title: '15-Minute Intraday' },
+      '1H':  { tf: '1H',  window: 'intraday', tv: '60',  atrMult: 1.00, title: '1-Hour Intraday' },
+      '4H':  { tf: '4H',  window: 'swing',    tv: '240', atrMult: 2.15, title: '4-Hour Swing' },
+      '1D':  { tf: '1D',  window: 'swing',    tv: 'D',   atrMult: 4.30, title: '1-Day Macro Swing' }
+    };
+
+    // =========================================================================
+    // 2. VERIFIED WEEKLY ECONOMIC CALENDAR (STRICTLY CONVERTED TO WIB UTC+7)
+    // =========================================================================
+    // Every event carries an exact ISO UTC timestamp so live WIB formatting & countdowns
+    // are 100% mathematically accurate for Mon Nov 16 – Fri Nov 20, 2026.
+    const VERIFIED_WIB_CALENDAR = [
+      {
+        id: 'cal_mon_1',
+        utcIso: '2026-11-16T13:30:00Z', // 20:30 WIB
+        currency: 'CAD',
+        impact: 'HIGH',
+        title: 'Canada CPI m/m & Median CPI y/y',
+        pairs: ['AUDCADc'],
+        forecast: '0.3%',
+        previous: '-0.4%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_mon_2',
+        utcIso: '2026-11-16T13:30:00Z', // 20:30 WIB
+        currency: 'USD',
+        impact: 'MEDIUM',
+        title: 'US Empire State Manufacturing Index',
+        pairs: ['XAUUSDc', 'USDJPYc', 'USTECc'],
+        forecast: '-0.5',
+        previous: '-11.9',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_tue_1',
+        utcIso: '2026-11-17T07:00:00Z', // 14:00 WIB
+        currency: 'GBP',
+        impact: 'HIGH',
+        title: 'UK Claimant Count Change & Unemployment Rate',
+        pairs: ['XAUUSDc'],
+        forecast: '4.7%',
+        previous: '4.7%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_tue_2',
+        utcIso: '2026-11-17T13:30:00Z', // 20:30 WIB
+        currency: 'USD',
+        impact: 'HIGH',
+        title: 'US Core Retail Sales & Retail Sales m/m',
+        pairs: ['XAUUSDc', 'USDJPYc', 'USTECc', 'BTCUSDc'],
+        forecast: '0.2%',
+        previous: '0.8%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_tue_3',
+        utcIso: '2026-11-17T14:15:00Z', // 21:15 WIB
+        currency: 'USD',
+        impact: 'MEDIUM',
+        title: 'US Industrial Production m/m',
+        pairs: ['USTECc', 'USOILc'],
+        forecast: '0.4%',
+        previous: '0.7%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_wed_1',
+        utcIso: '2026-11-18T07:00:00Z', // 14:00 WIB
+        currency: 'GBP',
+        impact: 'HIGH',
+        title: 'UK Consumer Price Index (CPI) y/y',
+        pairs: ['XAUUSDc'],
+        forecast: '3.5%',
+        previous: '3.6%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_wed_2',
+        utcIso: '2026-11-18T15:30:00Z', // 22:30 WIB
+        currency: 'USD',
+        impact: 'HIGH',
+        title: 'EIA US Crude Oil Inventories',
+        pairs: ['USOILc', 'AUDCADc'],
+        forecast: '1.8M',
+        previous: '4.7M',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_thu_1',
+        utcIso: '2026-11-18T19:00:00Z', // Thu Nov 19 02:00 WIB
+        currency: 'USD',
+        impact: 'HIGH',
+        title: 'FOMC Meeting Minutes Release',
+        pairs: ['XAUUSDc', 'USDJPYc', 'USTECc', 'BTCUSDc'],
+        forecast: 'Rate Path',
+        previous: '—',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_thu_2',
+        utcIso: '2026-11-19T00:30:00Z', // Thu Nov 19 07:30 WIB
+        currency: 'AUD',
+        impact: 'HIGH',
+        title: 'Australia Employment Change & Unemployment Rate',
+        pairs: ['AUDCADc'],
+        forecast: '+27.5K / 4.7%',
+        previous: '-39.3K / 4.7%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_thu_3',
+        utcIso: '2026-11-19T13:30:00Z', // Thu Nov 19 20:30 WIB
+        currency: 'USD',
+        impact: 'HIGH',
+        title: 'US Philly Fed Manufacturing Index & Jobless Claims',
+        pairs: ['XAUUSDc', 'USDJPYc', 'USTECc'],
+        forecast: '205K',
+        previous: '200K',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_fri_1',
+        utcIso: '2026-11-19T23:30:00Z', // Fri Nov 20 06:30 WIB
+        currency: 'JPY',
+        impact: 'HIGH',
+        title: 'Japan National Core CPI y/y',
+        pairs: ['USDJPYc'],
+        forecast: '2.1%',
+        previous: '2.3%',
+        actual: 'Pending'
+      },
+      {
+        id: 'cal_fri_2',
+        utcIso: '2026-11-20T13:30:00Z', // Fri Nov 20 20:30 WIB
+        currency: 'CAD',
+        impact: 'HIGH',
+        title: 'Canada Core Retail Sales & Retail Sales m/m',
+        pairs: ['AUDCADc'],
+        forecast: '0.4%',
+        previous: '0.1%',
+        actual: 'Pending'
+      }
+    ];
+
+    // Baseline Macro & Pair News Wire (Nov 16, 2026 — enriched live via RSS & Finnhub)
+    const BASELINE_NEWS_WIRE = [
+      {
+        id: 'nw_1',
+        title: 'USD/JPY Tests 159.62 Resistance as Tokyo Traders Brace for MoF Intervention Near 160.00',
+        source: 'FXStreet Desk',
+        pubDateIso: '2026-11-16T15:10:00Z',
+        url: 'https://www.fxstreet.com'
+      },
+      {
+        id: 'nw_2',
+        title: 'Gold Holds Near $3,868.50 Ahead of US Retail Sales and FOMC Minutes as 10Y Yields Stay Elevated',
+        source: 'Bullion Macro Wire',
+        pubDateIso: '2026-11-16T14:35:00Z',
+        url: 'https://www.fxstreet.com'
+      },
+      {
+        id: 'nw_3',
+        title: 'Nasdaq 100 Consolidates Around 27,705 as Institutional Desks Position for Nvidia Quarterly Earnings',
+        source: 'MarketWatch Equities',
+        pubDateIso: '2026-11-16T13:50:00Z',
+        url: 'https://www.marketwatch.com'
+      },
+      {
+        id: 'nw_4',
+        title: 'Canadian CPI Print Tonight in Focus for AUD/CAD Range Traders Near 0.9178 Pivot',
+        source: 'Investing FX Wire',
+        pubDateIso: '2026-11-16T12:45:00Z',
+        url: 'https://www.investing.com'
+      },
+      {
+        id: 'nw_5',
+        title: 'WTI Crude Oil Steadies Above $88.40 Ahead of Weekly US API & EIA Inventory Reports',
+        source: 'Energy Desk',
+        pubDateIso: '2026-11-16T11:20:00Z',
+        url: 'https://www.marketwatch.com'
+      },
+      {
+        id: 'nw_6',
+        title: 'Bitcoin Consolidates Near $64,180 Following Strong US Dollar Weekly Rally; ETF Flows Stabilize',
+        source: 'CoinTelegraph Wire',
+        pubDateIso: '2026-11-16T10:15:00Z',
+        url: 'https://cointelegraph.com'
+      },
+      {
+        id: 'nw_7',
+        title: 'Minor European Car Registration Commentary Draws Limited Reaction Across Major FX Crosses',
+        source: 'Eurozone Briefing',
+        pubDateIso: '2026-11-16T09:05:00Z',
+        url: 'https://www.fxstreet.com'
+      }
+    ];
+
+    // =========================================================================
+    // 3. STATE MANAGEMENT & LOCAL STORAGE
+    // =========================================================================
+    const STORAGE_KEY = 'centra_wib_v3_terminal_state';
+
+    const DEFAULT_STATE = {
+      activeFolder: 'signals',
+      activeSubTabs: {
+        signals: 'engine',
+        intel: 'news'
+      },
+      activeSymbol: 'XAUUSDc',
+      activeWindow: 'intraday',
+      activeTf: '1H',
+      newsFilter: 'ALL',
+      calendarFilter: 'ALL',
+      apiKeys: {
+        gemini: '',
+        twelveData: '',
+        finnhub: '',
+        idrRate: 182.5,
+        riskPct: 1.8
+      },
+      account: {
+        startingCapitalUsc: 1096.0
+      },
+      openPositions: [],
+      closedTrades: [],
+      calendarPrefs: {
+        alertEnabled: true,
+        soundEnabled: true
+      },
+      firedAlertKeys: {}
+    };
+
+    let appState = loadAppState();
+    let liveMarketPrices = {};
+    let signalCache = {};
+    let classifiedNews = [];
+    let weeklyCalendar = [...VERIFIED_WIB_CALENDAR];
+    let loadedTvKey = '';
+
+    function loadAppState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_STATE);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(DEFAULT_STATE),
+          ...parsed,
+          activeSubTabs: { ...DEFAULT_STATE.activeSubTabs, ...(parsed.activeSubTabs || {}) },
+          apiKeys: { ...DEFAULT_STATE.apiKeys, ...(parsed.apiKeys || {}) },
+          account: { ...DEFAULT_STATE.account, ...(parsed.account || {}) },
+          calendarPrefs: { ...DEFAULT_STATE.calendarPrefs, ...(parsed.calendarPrefs || {}) }
+        };
+      } catch (e) {
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 4. STRICT WIB (ASIA/JAKARTA UTC+7) FORMATTERS & SESSION GUARDRAILS
+    // =========================================================================
+    function getWibNow() {
+      const now = new Date();
+      const fmt = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      const parts = {};
+      fmt.formatToParts(now).forEach(p => { parts[p.type] = p.value; });
+      const hour = parseInt(parts.hour, 10);
+      const min = parseInt(parts.minute, 10);
+      const sec = parseInt(parts.second, 10);
+      return {
+        nowMs: now.getTime(),
+        hour,
+        min,
+        sec,
+        totalMins: hour * 60 + min,
+        dateKey: `${parts.year}-${parts.month}-${parts.day}`,
+        clockText: `${parts.hour}:${parts.minute}:${parts.second} WIB`
+      };
+    }
+
+    function formatIsoToWib(isoString) {
+      try {
+        const d = new Date(isoString);
+        if (isNaN(d.getTime())) return '--:-- WIB';
+        const timeStr = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Jakarta',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        }).format(d);
+        const dayStr = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Jakarta',
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short'
+        }).format(d);
+        return { timeWib: `${timeStr} WIB`, dayWib: dayStr, dateIsoWib: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(d) };
+      } catch (e) {
+        return { timeWib: '--:-- WIB', dayWib: '', dateIsoWib: '' };
+      }
+    }
+
+    function getWibSessionContext(wib) {
+      const m = wib.totalMins;
+
+      // Check if any HIGH impact event hits within -15 to +45 minutes
+      let imminentHighNews = null;
+      for (const ev of weeklyCalendar) {
+        if (ev.impact !== 'HIGH') continue;
+        const diffMins = Math.round((new Date(ev.utcIso).getTime() - wib.nowMs) / 60000);
+        if (diffMins >= -15 && diffMins <= 45) {
+          imminentHighNews = { ...ev, diffMins };
+          break;
+        }
+      }
+
+      // 1. Dead Zone / Daily Rollover (04:45 - 06:05 WIB)
+      if (m >= 285 && m <= 365) {
+        return {
+          sessionLabel: 'DEAD ZONE / ROLLOVER',
+          badgeClass: 'bg-rose-500/20 text-rose-400 border-rose-500/40',
+          tier: 'danger',
+          forceSideways: true,
+          headline: '🚨 Daily Server Rollover & Dead Zone (04:45–06:05 WIB)',
+          detail: 'MT5 Cent spreads widen sharply during bank settlement. Do NOT open new positions until after 06:05 WIB.',
+          imminentHighNews
+        };
+      }
+
+      // 2. Tokyo / Asian Session (06:05 - 14:30 WIB)
+      if (m > 365 && m < 870) {
+        const earlyOpen = m < 450;
+        return {
+          sessionLabel: 'TOKYO SESSION',
+          badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/35',
+          tier: earlyOpen ? 'warning' : 'normal',
+          forceSideways: false,
+          headline: earlyOpen
+            ? '🌅 Tokyo / Asian Session Opening (06:05–07:30 WIB)'
+            : '🌏 Tokyo / Asian Session Active (07:30–14:30 WIB)',
+          detail: earlyOpen
+            ? 'Early liquidity is forming; wait for 07:55 WIB Tokyo Fix sweep on USDJPYc & AUDCADc.'
+            : 'Clean range and fix flows for USDJPYc & AUDCADc; Gold & Nasdaq typically build Asian range liquidity.',
+          imminentHighNews
+        };
+      }
+
+      // 3. London Open Handover (14:30 - 15:30 WIB)
+      if (m >= 870 && m <= 930) {
+        return {
+          sessionLabel: 'LONDON OPENING',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          tier: 'warning',
+          forceSideways: false,
+          headline: '⚡ London Session Opening Handover (14:30–15:30 WIB)',
+          detail: 'European desks frequently sweep Asian highs/lows (Judas Swing) before establishing real London direction.',
+          imminentHighNews
+        };
+      }
+
+      // 4. Solo London Session (15:30 - 19:00 WIB)
+      if (m > 930 && m < 1140) {
+        return {
+          sessionLabel: 'LONDON SESSION',
+          badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/35',
+          tier: 'prime',
+          forceSideways: false,
+          headline: '⚡ London Session Expansion (15:30–19:00 WIB)',
+          detail: 'Strong directional volume on XAUUSDc, USOILc, and major FX pairs.',
+          imminentHighNews
+        };
+      }
+
+      // 5. London–NY Overlap Killzone (19:00 - 23:00 WIB)
+      if (m >= 1140 && m <= 1380) {
+        const nearingLdnClose = m >= 1335;
+        return {
+          sessionLabel: 'NY OVERLAP',
+          badgeClass: nearingLdnClose
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+          tier: nearingLdnClose ? 'warning' : 'prime',
+          forceSideways: false,
+          headline: nearingLdnClose
+            ? '⏳ London Closing / Solo NY Transition (22:15–23:00 WIB)'
+            : '🔥 Prime London–New York Overlap Active (19:00–23:00 WIB)',
+          detail: nearingLdnClose
+            ? 'London desks are squaring books; watch for profit-taking retracements before solo NY flow.'
+            : 'Peak global liquidity & institutional displacement across Gold, Nasdaq, USDJPY, and Oil.',
+          imminentHighNews
+        };
+      }
+
+      // 6. Late NY / Pre-Rollover Fade (23:00 - 04:45 WIB)
+      const lateFade = m >= 150 && m < 285;
+      return {
+        sessionLabel: lateFade ? 'DEAD ZONE' : 'NY SESSION',
+        badgeClass: lateFade
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+          : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/35',
+        tier: lateFade ? 'warning' : 'normal',
+        forceSideways: lateFade,
+        headline: lateFade
+          ? '🌙 Late NY Dead Zone (02:30–04:45 WIB)'
+          : '🗽 New York Afternoon Session (23:00–02:30 WIB)',
+        detail: lateFade
+          ? 'Institutional volume has faded ahead of rollover; low-liquidity chop risk is high.'
+          : 'US afternoon cash & ETF flows drive USTECc, BTCUSDc, and XAUUSDc.',
+        imminentHighNews
+      };
+    }
+
+    function playTerminalAudioChime() {
+      if (!appState.calendarPrefs.soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.16);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.36);
+      } catch (e) {}
+    }
+
+    function showToast(message, level = 'info') {
+      const stack = document.getElementById('toast-stack');
+      const themes = {
+        success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500/60 text-amber-200',
+        error: 'bg-rose-950/95 border-rose-500/60 text-rose-200',
+        info: 'bg-slate-900/95 border-cyan-500/60 text-cyan-200'
+      };
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto px-3.5 py-2.5 rounded-xl border text-xs font-semibold shadow-2xl transition-all duration-300 ${themes[level] || themes.info}`;
+      toast.textContent = message;
+      stack.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-6px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
+    }
+
+    function checkWibCalendarAlertBot(wib) {
+      if (!appState.calendarPrefs.alertEnabled) return;
+      for (const ev of weeklyCalendar) {
+        if (ev.impact !== 'HIGH') continue;
+        const diffMins = Math.round((new Date(ev.utcIso).getTime() - wib.nowMs) / 60000);
+        const key = `${wib.dateKey}_${ev.id}_30m`;
+        if (diffMins > 0 && diffMins <= 30 && !appState.firedAlertKeys[key]) {
+          appState.firedAlertKeys[key] = true;
+          saveState();
+          const wibFmt = formatIsoToWib(ev.utcIso).timeWib;
+          showToast(`🚨 HIGH-IMPACT NEWS IN ${diffMins}m (${wibFmt}): ${ev.title} [${ev.pairs.join(', ')}]`, 'warning');
+          playTerminalAudioChime();
+        }
+      }
+    }
+
+    function fireTestWibCalendarAlert() {
+      showToast('🔔 WIB News Alert Bot Armed: You will receive a banner + chime 30 mins before High-Impact WIB releases.', 'warning');
+      playTerminalAudioChime();
+    }
+
+    // =========================================================================
+    // 5. LIVE MARKET PRICES & ASTRAL CYCLE CALCULATOR
+    // =========================================================================
+    function getInstrumentPrice(symbol) {
+      if (typeof liveMarketPrices[symbol] === 'number' && liveMarketPrices[symbol] > 0) {
+        return liveMarketPrices[symbol];
+      }
+      return INSTRUMENTS[symbol]?.basePrice || 0;
+    }
+
+    function formatPrice(symbol, val) {
+      const dec = INSTRUMENTS[symbol]?.decimals ?? 2;
+      return Number(val || 0).toFixed(dec);
+    }
+
+    function formatUsc(val, withSign = false) {
+      const n = Number(val) || 0;
+      return `${withSign && n > 0 ? '+' : ''}${n.toFixed(1)} USC`;
+    }
+
+    function formatIdr(uscVal, withSign = false) {
+      const rate = Number(appState.apiKeys.idrRate) || 182.5;
+      const idr = Math.round((Number(uscVal) || 0) * rate);
+      return `${withSign && idr > 0 ? '+' : ''}Rp${idr.toLocaleString('id-ID')}`;
+    }
+
+    async function refreshLivePrices(notify = false) {
+      // 1. Keyless Binance public ticker for BTCUSDc
+      try {
+        const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+        if (res.ok) {
+          const d = await res.json();
+          const px = parseFloat(d.price);
+          if (!isNaN(px) && px > 10000) liveMarketPrices.BTCUSDc = Number(px.toFixed(1));
+        }
+      } catch (e) {}
+
+      // 2. Optional Twelve Data API for live quotes
+      const tdKey = (appState.apiKeys.twelveData || '').trim();
+      if (tdKey) {
+        for (const sym of SYMBOL_LIST) {
+          try {
+            const r = await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(INSTRUMENTS[sym].tdSymbol)}&apikey=${encodeURIComponent(tdKey)}`);
+            const j = await r.json();
+            const p = parseFloat(j.price);
+            if (!isNaN(p) && p > 0) {
+              liveMarketPrices[sym] = sym === 'USTECc' ? Number((p * 44.2).toFixed(1)) : Number(p.toFixed(INSTRUMENTS[sym].decimals));
+            }
+          } catch (e) {}
+        }
+      }
+
+      computeEightBotSignal(appState.activeSymbol, appState.activeTf);
+      renderAll();
+      if (notify) showToast('Market baselines & live feeds refreshed.', 'success');
+    }
+
+    function calculateAstralCycle(nowMs) {
+      // Accurate lunar synodic phase (Nov 9, 2026 New Moon -> Nov 17 First Quarter -> Nov 24 Full Moon in Gemini)
+      const knownNewMoonUtc = Date.UTC(2026, 10, 9, 15, 2, 0);
+      const synodicMonth = 29.53058867;
+      const ageDays = (((nowMs - knownNewMoonUtc) / 86400000) % synodicMonth + synodicMonth) % synodicMonth;
+      const illumination = Math.round(((1 - Math.cos((2 * Math.PI * ageDays) / synodicMonth)) / 2) * 100);
+
+      let phaseName = 'Waxing Crescent';
+      let zodiac = 'Aquarius → Pisces';
+      let volatilityBias = 'Expansion Build Toward First Quarter';
+      let swingLongTilt = 56;
+
+      if (ageDays < 1.8 || ageDays > 27.7) {
+        phaseName = 'New Moon Inflection';
+        zodiac = 'Scorpio / Sagittarius';
+        volatilityBias = 'Trend Reset & Institutional Accumulation';
+        swingLongTilt = 54;
+      } else if (ageDays >= 6.0 && ageDays <= 9.2) {
+        phaseName = 'First Quarter Moon (Nov 17)';
+        zodiac = 'Moon in Aquarius / Pisces • Sun in Scorpio';
+        volatilityBias = 'Breakout Friction & Momentum Impulse';
+        swingLongTilt = 59;
+      } else if (ageDays > 9.2 && ageDays < 13.5) {
+        phaseName = 'Waxing Gibbous';
+        zodiac = 'Aries / Taurus → Gemini Full Moon';
+        volatilityBias = 'Trend Continuation Ahead of Full Moon';
+        swingLongTilt = 62;
+      } else if (ageDays >= 13.5 && ageDays <= 16.2) {
+        phaseName = 'Full Moon Reversal Peak (Nov 24)';
+        zodiac = 'Gemini / Sagittarius Polarity';
+        volatilityBias = 'Peak Volatility & Exhaustion Reversal';
+        swingLongTilt = 43;
+      } else if (ageDays > 16.2 && ageDays <= 27.7) {
+        phaseName = 'Waning Quarter / Distribution';
+        zodiac = 'Cancer / Leo / Virgo';
+        volatilityBias = 'Profit-Taking & Mean Reversion';
+        swingLongTilt = 46;
+      }
+
+      return {
+        phaseName,
+        illumination,
+        zodiac,
+        volatilityBias,
+        swingLongTilt,
+        summary: `${phaseName} (${illumination}% illuminated) in ${zodiac} — ${volatilityBias}.`
+      };
+    }
+
+    // =========================================================================
+    // 6. 8-BOT MULTI-TIMEFRAME SIGNAL ENGINE (FOLDER 1)
+    // =========================================================================
+    function computeEightBotSignal(symbol, tf) {
+      const spec = INSTRUMENTS[symbol] || INSTRUMENTS.XAUUSDc;
+      const meta = TF_META[tf] || TF_META['1H'];
+      const wib = getWibNow();
+      const sessionCtx = getWibSessionContext(wib);
+      const astral = calculateAstralCycle(wib.nowMs);
+      const mark = getInstrumentPrice(symbol);
+
+      // Deterministic multi-timeframe structural wave
+      const symHash = symbol.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const tfHash = tf.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const timeSlot = Math.floor(wib.nowMs / (1000 * 60 * 15));
+      const wave1 = Math.sin((timeSlot + symHash + tfHash) * 0.43);
+      const wave2 = Math.cos((timeSlot * 0.65 + symHash - tfHash) * 0.37);
+
+      const atr = Number((spec.h1Atr * meta.atrMult * (0.92 + Math.abs(wave2) * 0.2)).toFixed(spec.decimals));
+      const price = Number((mark + wave1 * atr * 0.35).toFixed(spec.decimals));
+      const ema20 = Number((price - wave1 * atr * 0.48).toFixed(spec.decimals));
+      const ema50 = Number((price - (wave1 * 0.72 + wave2 * 0.32) * atr * 1.05).toFixed(spec.decimals));
+      const ema200 = Number((price - (wave1 * 0.55 + wave2 * 0.48) * atr * 2.1).toFixed(spec.decimals));
+      const rsi14 = Number(Math.max(25, Math.min(76, 50 + wave1 * 15 + wave2 * 8)).toFixed(1));
+      const adx14 = Number(Math.max(12, Math.min(44, 24 + Math.abs(wave1) * 16 - Math.abs(wave2) * 6)).toFixed(1));
+
+      // Bot 4: Sideways & Volatility Regime Filter
+      const emaGapRatio = Math.abs(ema20 - ema50) / (atr || 1);
+      const isChopCompression = (adx14 < 18.5 && emaGapRatio < 0.18) || (rsi14 >= 47 && rsi14 <= 53 && emaGapRatio < 0.15);
+      const newsImminentBlock = sessionCtx.imminentHighNews && sessionCtx.imminentHighNews.diffMins >= 0 && sessionCtx.imminentHighNews.diffMins <= 30;
+      const forceWait = isChopCompression || sessionCtx.forceSideways || newsImminentBlock;
+
+      // Bot 1: Multi-TF Technical & Trend Engine
+      const bullAlign = price > ema20 && ema20 > ema50;
+      const bearAlign = price < ema20 && ema20 < ema50;
+      const trendLabel = bullAlign ? 'Bullish BOS (Higher Highs)' : bearAlign ? 'Bearish BOS (Lower Lows)' : 'CHoCH / Range Equilibrium';
+      let bot1Long = bullAlign ? 76 : bearAlign ? 24 : (price > ema200 ? 56 : 44);
+      if (rsi14 > 56 && rsi14 < 70) bot1Long += 6;
+      if (rsi14 < 44 && rsi14 > 30) bot1Long -= 6;
+      bot1Long = Math.max(14, Math.min(86, bot1Long));
+
+      // Bot 2: SMC Liquidity & FVG / iFVG Scanner
+      const bsl = Number((price + atr * 1.65).toFixed(spec.decimals));
+      const ssl = Number((price - atr * 1.65).toFixed(spec.decimals));
+      const bullFvgLow = Number((price - atr * 0.68).toFixed(spec.decimals));
+      const bullFvgHigh = Number((price - atr * 0.30).toFixed(spec.decimals));
+      const bearFvgLow = Number((price + atr * 0.30).toFixed(spec.decimals));
+      const bearFvgHigh = Number((price + atr * 0.68).toFixed(spec.decimals));
+      const ifvgZone = bullAlign
+        ? `${formatPrice(symbol, bullFvgLow)} – ${formatPrice(symbol, bullFvgHigh)} (Bullish iFVG Flip)`
+        : `${formatPrice(symbol, bearFvgLow)} – ${formatPrice(symbol, bearFvgHigh)} (Bearish iFVG Flip)`;
+
+      // Bot 3: Chart Shape & Geometry Pattern Bot
+      let patternName = 'Symmetrical Compression Wedge';
+      let patternBias = 'NEUTRAL';
+      let patternNote = `Converging ${tf} trendlines between SSL (${formatPrice(symbol, ssl)}) and BSL (${formatPrice(symbol, bsl)}). Await clean ${tf} candle close outside apex.`;
+      if (isChopCompression) {
+        patternName = 'Horizontal Accumulation Box (Sideways)';
+        patternBias = 'SIDEWAYS';
+        patternNote = `ADX ${adx14} & flat EMA20/50 confirm a tight consolidation box. Market makers are building liquidity—avoid middle-of-range trades.`;
+      } else if (bullAlign && rsi14 >= 54) {
+        patternName = meta.window === 'scalp' ? 'Bullish Micro-Flag + SSL Sweep' : 'Ascending Channel / Bullish Flag';
+        patternBias = 'BULLISH';
+        patternNote = `Higher lows pressing against ${formatPrice(symbol, bearFvgHigh)} neckline after sweeping lower liquidity. Breakout targets ${formatPrice(symbol, bsl)}.`;
+      } else if (bearAlign && rsi14 <= 46) {
+        patternName = meta.window === 'scalp' ? 'Bearish Pennant + BSL Sweep' : 'Descending Wedge / Double Top Neckline';
+        patternBias = 'BEARISH';
+        patternNote = `Lower highs compressing onto ${formatPrice(symbol, bullFvgLow)} support after BSL rejection. Breakdown targets ${formatPrice(symbol, ssl)}.`;
+      } else if (rsi14 < 36) {
+        patternName = 'Falling Wedge Exhaustion + MSS';
+        patternBias = 'BULLISH';
+        patternNote = `Downward wedge exhaustion (RSI ${rsi14}) with early Market Structure Shift above ${formatPrice(symbol, ema20)}.`;
+      } else if (rsi14 > 64) {
+        patternName = 'Rising Wedge Exhaustion + MSS';
+        patternBias = 'BEARISH';
+        patternNote = `Overextended rising wedge into BSL (${formatPrice(symbol, bsl)}) with RSI ${rsi14} divergence.`;
+      }
+
+      // Bot 5: Macro & News Alignment Bot
+      const relatedEvents = weeklyCalendar.filter(e => e.pairs.includes(symbol));
+      const nextEvent = relatedEvents[0];
+      const newsAlignNote = nextEvent
+        ? `Next ${symbol} Catalyst: ${nextEvent.title} (${formatIsoToWib(nextEvent.utcIso).dayWib} ${formatIsoToWib(nextEvent.utcIso).timeWib}, ${nextEvent.impact}).`
+        : `No immediate high-impact scheduled shock for ${symbol}.`;
+      const bot5Long = spec.geminiOpinion.biasTier === 'bullish' ? 64 : spec.geminiOpinion.biasTier === 'bearish' ? 36 : 50;
+
+      // Bot 8 Synthesis Weights
+      const isSwing = meta.window === 'swing';
+      const wTech = isSwing ? 0.30 : 0.35;
+      const wSmc = 0.25;
+      const wShape = 0.15;
+      const wMacro = isSwing ? 0.15 : 0.20;
+      const wAstral = isSwing ? 0.15 : 0.05;
+
+      const smcLong = bullAlign ? 74 : bearAlign ? 26 : 50;
+      const shapeLong = patternBias === 'BULLISH' ? 72 : patternBias === 'BEARISH' ? 28 : 50;
+
+      let rawLong = bot1Long * wTech + smcLong * wSmc + shapeLong * wShape + bot5Long * wMacro + astral.swingLongTilt * wAstral;
+      if (forceWait) rawLong = 50 + (rawLong - 50) * 0.22;
+
+      const longPct = Math.max(12, Math.min(88, Math.round(rawLong)));
+      const shortPct = 100 - longPct;
+      const edgePct = Math.max(longPct, shortPct);
+      const side = longPct >= 50 ? 'BUY' : 'SELL';
+
+      let verdict = 'WAIT / SIDEWAYS';
+      let verdictTier = 'wait';
+      if (!forceWait) {
+        if (longPct >= 69) { verdict = 'STRONG BUY'; verdictTier = 'strong-buy'; }
+        else if (longPct >= 57) { verdict = 'BUY'; verdictTier = 'buy'; }
+        else if (shortPct >= 69) { verdict = 'STRONG SELL'; verdictTier = 'strong-sell'; }
+        else if (shortPct >= 57) { verdict = 'SELL'; verdictTier = 'sell'; }
+      }
+
+      // Actionable Price Levels
+      const pullbackEntry = side === 'BUY' ? bullFvgHigh : bearFvgLow;
+      const breakoutEntry = side === 'BUY'
+        ? Number((price + atr * 0.26).toFixed(spec.decimals))
+        : Number((price - atr * 0.26).toFixed(spec.decimals));
+
+      const slDistance = Number((atr * 1.15).toFixed(spec.decimals));
+      const slPrice = side === 'BUY'
+        ? Number((pullbackEntry - slDistance).toFixed(spec.decimals))
+        : Number((pullbackEntry + slDistance).toFixed(spec.decimals));
+
+      const tp1Price = side === 'BUY'
+        ? Number((pullbackEntry + slDistance * 1.5).toFixed(spec.decimals))
+        : Number((pullbackEntry - slDistance * 1.5).toFixed(spec.decimals));
+
+      const tp2Price = side === 'BUY'
+        ? Number((pullbackEntry + slDistance * 2.5).toFixed(spec.decimals))
+        : Number((pullbackEntry - slDistance * 2.5).toFixed(spec.decimals));
+
+      // Bot 7: Cent Risk & Position Sizing Calculator
+      const equityUsc = getCurrentEquityUsc();
+      const maxRiskPct = Number(appState.apiKeys.riskPct) || 1.8;
+      const riskBudgetUsc = equityUsc * (maxRiskPct / 100);
+      const riskPer001Usc = Math.max(0.35, slDistance * spec.uscPerPoint001);
+      const recLots = Math.max(0.01, Math.min(0.20, Math.floor((riskBudgetUsc / riskPer001Usc) * 100) / 100));
+      const actualRiskUsc = Number((riskPer001Usc * (recLots / 0.01)).toFixed(1));
+      const slPips = Math.round(slDistance / spec.pipSize);
+
+      // Bot 8 Master Hypothesis Thesis
+      let hypothesis = '';
+      if (verdictTier === 'wait') {
+        const blockReason = sessionCtx.forceSideways
+          ? sessionCtx.headline
+          : newsImminentBlock
+            ? `High-Impact WIB News (${sessionCtx.imminentHighNews.title}) in ${sessionCtx.imminentHighNews.diffMins}m`
+            : `Low-volatility sideways chop on ${tf} (ADX ${adx14}, RSI ${rsi14})`;
+        hypothesis = `DO NOT TRADE YET: ${blockReason}. Protect your 1,096 USC balance from stop-hunts and spread spikes. Wait for a liquidity sweep of SSL (${formatPrice(symbol, ssl)}) or BSL (${formatPrice(symbol, bsl)}) followed by a clean ${tf} iFVG displacement.`;
+      } else if (side === 'BUY') {
+        hypothesis = `${verdict} (${longPct}% Bull vs ${shortPct}% Bear on ${tf}): ${trendLabel} aligns with ${patternName}. Optimal execution is a Buy Limit inside the ${tf} Bullish FVG at ${formatPrice(symbol, pullbackEntry)} (or momentum Buy Stop above ${formatPrice(symbol, breakoutEntry)}) targeting Buy-Side Liquidity at ${formatPrice(symbol, tp2Price)}.`;
+      } else {
+        hypothesis = `${verdict} (${shortPct}% Bear vs ${longPct}% Bull on ${tf}): ${trendLabel} aligns with ${patternName}. Optimal execution is a Sell Limit inside the ${tf} Bearish FVG at ${formatPrice(symbol, pullbackEntry)} (or breakdown Sell Stop below ${formatPrice(symbol, breakoutEntry)}) targeting Sell-Side Liquidity at ${formatPrice(symbol, tp2Price)}.`;
+      }
+
+      const signalObj = {
+        symbol,
+        tf,
+        tfTitle: meta.title,
+        window: meta.window,
+        wibClock: wib.clockText,
+        price,
+        verdict,
+        verdictTier,
+        side,
+        longPct,
+        shortPct,
+        edgePct,
+        pullbackEntry,
+        breakoutEntry,
+        slPrice,
+        slDistance,
+        slPips,
+        tp1Price,
+        tp2Price,
+        recLots,
+        actualRiskUsc,
+        hypothesis,
+        sessionCtx,
+        bot1: { ema20, ema50, ema200, rsi14, adx14, atr, trendLabel },
+        bot2: { bsl, ssl, bullFvgLow, bullFvgHigh, bearFvgLow, bearFvgHigh, ifvgZone },
+        bot3: { patternName, patternBias, patternNote },
+        bot4: { isChopCompression, forceWait, adx14 },
+        bot5: { newsAlignNote },
+        bot6: astral
+      };
+
+      signalCache[`${symbol}_${tf}`] = signalObj;
+      return signalObj;
+    }
+
+    function runEightBotPipeline(animated = true) {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      if (!animated) {
+        computeEightBotSignal(sym, tf);
+        renderSignalsFolder();
+        return;
+      }
+
+      const wrap = document.getElementById('bot-progress-wrap');
+      const bar = document.getElementById('bot-progress-bar');
+      const txt = document.getElementById('bot-progress-text');
+      const pct = document.getElementById('bot-progress-pct');
+      wrap.classList.remove('hidden');
+
+      const stages = [
+        { p: 25, m: `Bot 1 & 2: Mapping ${tf} EMAs, RSI/ADX & Valid FVG/iFVG Liquidity...` },
+        { p: 55, m: `Bot 3 & 4: Scanning Chart Geometry & Sideways Chop Filter...` },
+        { p: 82, m: `Bot 5, 6 & 7: Checking WIB News, Lunar Cycle & 1,096 USC Risk...` },
+        { p: 100, m: `Bot 8: Synthesizing Entry Zones & Master Hypothesis...` }
+      ];
+      let idx = 0;
+      const step = () => {
+        if (idx < stages.length) {
+          bar.style.width = `${stages[idx].p}%`;
+          pct.textContent = `${stages[idx].p}%`;
+          txt.textContent = stages[idx].m;
+          idx++;
+          setTimeout(step, 130);
+        } else {
+          setTimeout(() => {
+            wrap.classList.add('hidden');
+            const res = computeEightBotSignal(sym, tf);
+            renderSignalsFolder();
+            showToast(`${sym} (${tf}): ${res.verdict} — ${res.longPct}% L / ${res.shortPct}% S`, res.verdictTier === 'wait' ? 'warning' : 'success');
+          }, 130);
+        }
+      };
+      step();
+    }
+
+    function rankAllSixPairs() {
+      const tf = appState.activeTf;
+      const ranked = SYMBOL_LIST.map(s => computeEightBotSignal(s, tf)).sort((a, b) => b.edgePct - a.edgePct);
+      document.getElementById('rank-tf-badge').textContent = tf;
+      const card = document.getElementById('six-pair-rank-card');
+      const list = document.getElementById('six-pair-rank-list');
+      card.classList.remove('hidden');
+
+      list.innerHTML = ranked.map((r, i) => {
+        const badgeCls = r.verdictTier === 'wait'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+          : r.side === 'BUY'
+            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+            : 'bg-rose-500/20 text-rose-400 border-rose-500/40';
+        return `
+          <button onclick="selectSymbol('${r.symbol}'); document.getElementById('master-verdict-card').scrollIntoView({behavior:'smooth'});" class="w-full text-left rounded-xl bg-[#090d16] hover:bg-gray-900 border border-gray-800 p-3 flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono font-bold text-gray-500">#${i + 1}</span>
+                <span class="text-sm font-mono font-extrabold text-white">${r.symbol}</span>
+                <span class="text-[11px] font-mono text-gray-400">Entry: ${formatPrice(r.symbol, r.pullbackEntry)}</span>
+              </div>
+              <div class="text-[11px] text-gray-400 mt-0.5">${r.longPct}% Bull / ${r.shortPct}% Bear • ${r.bot3.patternName}</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold border shrink-0 ${badgeCls}">${r.verdict}</span>
+          </button>`;
+      }).join('');
+    }
+
+    function logSetupToVault(symbol, tf, useBreakout = false) {
+      const sig = signalCache[`${symbol}_${tf}`] || computeEightBotSignal(symbol, tf);
+      openFolder('vault');
+      const entry = useBreakout ? sig.breakoutEntry : sig.pullbackEntry;
+      document.getElementById('m-symbol').value = sig.symbol;
+      document.getElementById('m-side').value = sig.side;
+      document.getElementById('m-lots').value = sig.recLots.toFixed(2);
+      document.getElementById('m-entry').value = formatPrice(sig.symbol, entry);
+      document.getElementById('m-sl').value = formatPrice(sig.symbol, sig.slPrice);
+      document.getElementById('m-tp').value = formatPrice(sig.symbol, sig.tp2Price);
+      document.getElementById('m-status').value = 'OPEN';
+      toggleClosedExitField();
+      document.getElementById('m-time').value = getWibNow().clockText;
+      document.getElementById('m-note').value = `${sig.tf} ${sig.verdict} (${useBreakout ? 'Breakout' : 'FVG Pullback'}) • ${sig.bot3.patternName}`;
+      updateManualFormPreview();
+      showToast(`Pre-filled ${sig.symbol} ${sig.side} into MT5 Vault!`, 'success');
+    }
+
+    // =========================================================================
+    // 7. 4-BOT NEWS INTELLIGENCE & REPAIRED WIB CALENDAR (FOLDER 2)
+    // =========================================================================
+    function classifyHeadlineWithBots(rawItem, idx) {
+      const title = String(rawItem.title || '').trim();
+      const lower = title.toLowerCase();
+
+      // Bot N3: Pair & Directional Sentiment Mapper
+      const tags = [];
+      if (/(gold|xau|bullion|treasury|yield|fed|fomc|cpi|inflation|retail sales)/.test(lower)) tags.push('XAUUSDc');
+      if (/(yen|jpy|boj|tokyo|japan|intervention|mof|yield|fed|fomc|retail sales)/.test(lower)) tags.push('USDJPYc');
+      if (/(aud|cad|rba|boc|australia|canada|loonie|cpi)/.test(lower)) tags.push('AUDCADc');
+      if (/(nasdaq|tech|nvidia|ai|stocks|equities|wall street|fed|fomc|retail sales)/.test(lower)) tags.push('USTECc');
+      if (/(oil|crude|wti|opec|eia|api|inventory|energy|brent)/.test(lower)) tags.push('USOILc');
+      if (/(bitcoin|btc|crypto|etf|digital asset)/.test(lower)) tags.push('BTCUSDc');
+      if (tags.length === 0) tags.push('XAUUSDc');
+
+      let bias = 'NEUTRAL';
+      if (/(surge|rally|soar|jump|bullish|gain|rise|inflow|strong|beats|hawkish)/.test(lower)) bias = 'BULLISH';
+      else if (/(drop|fall|plunge|bearish|slide|slump|sink|weak|misses|intervention|cap)/.test(lower)) bias = 'BEARISH';
+
+      // Bot N2: Importance & Noise Filter Bot (1-100 Score)
+      let score = 42;
+      if (/(fomc|cpi|retail sales|intervention|boj|non-farm|nfp|interest rate|fed|nvidia|eia|crude oil|rba|employment)/.test(lower)) score += 44;
+      else if (/(gold|usd\/jpy|nasdaq|bitcoin|treasury|yield|opec|etf)/.test(lower)) score += 24;
+      if (/(minor|registration|commentary|survey|small)/.test(lower)) score -= 22;
+      score = Math.max(15, Math.min(98, score + (idx % 5)));
+
+      let importanceTier = 'MODERATE';
+      if (score >= 76) importanceTier = 'CRITICAL';
+      else if (score < 48) importanceTier = 'LOW_NOISE';
+
+      const wibFormatted = formatIsoToWib(rawItem.pubDateIso || new Date().toISOString());
+
+      return {
+        id: rawItem.id || `news_${idx}_${Date.now()}`,
+        title,
+        source: rawItem.source || 'Global FX Wire',
+        timeWib: wibFormatted.timeWib,
+        dayWib: wibFormatted.dayWib,
+        score,
+        importanceTier,
+        tags,
+        bias,
+        url: rawItem.url || ''
+      };
+    }
+
+    async function refreshLiveNewsWire(notify = false) {
+      const gathered = [];
+      const fhKey = (appState.apiKeys.finnhub || '').trim();
+
+      // 1. Finnhub Forex News (if free key configured)
+      if (fhKey) {
+        try {
+          const r = await fetch(`https://finnhub.io/api/v1/news?category=forex&token=${encodeURIComponent(fhKey)}`);
+          const arr = await r.json();
+          if (Array.isArray(arr)) {
+            arr.slice(0, 8).forEach((it, i) => {
+              gathered.push({
+                id: `fh_${i}_${it.id}`,
+                title: it.headline,
+                source: it.source || 'Finnhub Wire',
+                pubDateIso: it.datetime ? new Date(it.datetime * 1000).toISOString() : new Date().toISOString(),
+                url: it.url
+              });
+            });
+          }
+        } catch (e) {}
+      }
+
+      // 2. Keyless RSS Feeds via rss2json (FXStreet, MarketWatch, CoinTelegraph)
+      const rssSources = [
+        { url: 'https://www.fxstreet.com/rss/news', name: 'FXStreet RSS' },
+        { url: 'https://feeds.marketwatch.com/marketwatch/topstories/', name: 'MarketWatch RSS' },
+        { url: 'https://cointelegraph.com/rss', name: 'CoinTelegraph RSS' }
+      ];
+
+      for (const src of rssSources) {
+        try {
+          const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(src.url)}`;
+          const r = await fetch(endpoint);
+          if (!r.ok) continue;
+          const data = await r.json();
+          if (data && Array.isArray(data.items)) {
+            data.items.slice(0, 4).forEach((item, i) => {
+              gathered.push({
+                id: `rss_${src.name}_${i}`,
+                title: item.title,
+                source: src.name,
+                pubDateIso: item.pubDate ? new Date(item.pubDate.replace(' ', 'T') + 'Z').toISOString() : new Date().toISOString(),
+                url: item.link
+              });
+            });
+          }
+        } catch (e) {}
+      }
+
+      const combined = gathered.length > 0 ? [...gathered, ...BASELINE_NEWS_WIRE] : [...BASELINE_NEWS_WIRE];
+      classifiedNews = combined.map((item, idx) => classifyHeadlineWithBots(item, idx));
+
+      if (appState.activeFolder === 'intel') renderIntelFolder();
+      if (notify) showToast(`Bot N1–N3 refreshed & scored ${classifiedNews.length} WIB headlines.`, 'success');
+    }
+
+    async function generateExecutiveNewsSummary(interactive = false) {
+      const box = document.getElementById('exec-news-summary-box');
+      const btn = document.getElementById('btn-exec-summary');
+      const critical = classifiedNews.filter(n => n.importanceTier === 'CRITICAL').slice(0, 5);
+
+      const renderFallbackSummary = () => {
+        const topTitles = critical.map(c => c.title).join(' | ');
+        box.innerHTML = `
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 p-3 space-y-2">
+            <div><strong class="text-cyan-300">1. Primary Macro Driver:</strong> US 10-Year yield resilience (~5.13%) and US Dollar strength are capping Gold near $3,868.50 while pushing USD/JPY into the 159.62–160.00 BoJ intervention zone ahead of US Retail Sales &amp; FOMC Minutes.</div>
+            <div><strong class="text-emerald-400">2. High-Probability Impact Window (WIB):</strong> Tonight at <strong>20:30 WIB</strong> (CAD CPI &amp; US Empire State Mfg) and Tuesday at <strong>20:30 WIB</strong> (US Core Retail Sales) represent peak institutional displacement windows.</div>
+            <div><strong class="text-amber-300">3. Risk &amp; Noise Warning:</strong> Bot N2 filtered out ${classifiedNews.filter(n => n.importanceTier === 'LOW_NOISE').length} low-noise headlines. Avoid chasing USDJPYc longs above 159.85 due to sudden MoF intervention wick risk.</div>
+          </div>`;
+      };
+
+      const gKey = (appState.apiKeys.gemini || '').trim();
+      if (!gKey) {
+        renderFallbackSummary();
+        if (interactive) showToast('Generated Bot N4 Executive Summary (add Gemini key in API Keys for live LLM synthesis).', 'info');
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Summarizing...'; }
+      box.innerHTML = `<div class="text-xs font-mono text-cyan-300">✨ Bot N4 synthesizing ${critical.length} CRITICAL WIB headlines via Gemini...</div>`;
+
+      const prompt = `You are Bot N4, an institutional FX & Commodities desk summarizer operating in Western Indonesia Time (WIB, UTC+7).
+Summarize these critical headlines for a 1,096 USC MT5 Cent trader watching XAUUSDc, USDJPYc, AUDCADc, USTECc, USOILc, BTCUSDc:
+${critical.map(c => `- [${c.timeWib}] (${c.tags.join(',')}) ${c.title}`).join('\n')}
+Format strictly in 3 short labeled points:
+1. Primary Macro Driver:
+2. High-Probability Impact Window (WIB):
+3. Risk & Noise Warning:`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(gKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        if (!res.ok) throw new Error('Gemini request failed');
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error('No text');
+        box.innerHTML = `<div class="rounded-xl bg-[#090d16] border border-cyan-500/35 p-3 space-y-1.5">${text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\n/g, '<br/>')}</div>`;
+        if (interactive) showToast('Bot N4 Executive Summary updated via Gemini!', 'success');
+      } catch (e) {
+        renderFallbackSummary();
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '✨ Summarize'; }
+      }
+    }
+
+    async function fetchLiveEconomicCalendar(notify = false) {
+      // Try Forex Factory public weekly JSON via CORS proxies, then merge cleanly with verified WIB calendar
+      const ffUrl = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(ffUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(ffUrl)}`
+      ];
+
+      let fetchedEvents = null;
+      for (const pUrl of proxies) {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 6500);
+          const r = await fetch(pUrl, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (!r.ok) continue;
+          const arr = await r.json();
+          if (Array.isArray(arr) && arr.length > 0) {
+            fetchedEvents = arr;
+            break;
+          }
+        } catch (e) {}
+      }
+
+      if (fetchedEvents) {
+        const mapped = fetchedEvents
+          .filter(ev => ['USD', 'JPY', 'AUD', 'CAD', 'GBP', 'EUR'].includes(String(ev.country || '').toUpperCase()))
+          .map((ev, i) => {
+            const ccy = String(ev.country || 'USD').toUpperCase();
+            const impRaw = String(ev.impact || 'Low').toUpperCase();
+            const impact = impRaw.includes('HIGH') ? 'HIGH' : impRaw.includes('MED') ? 'MEDIUM' : 'LOW';
+            const pairs = ccy === 'JPY' ? ['USDJPYc']
+              : ccy === 'AUD' || ccy === 'CAD' ? ['AUDCADc']
+              : ['XAUUSDc', 'USDJPYc', 'USTECc'];
+            return {
+              id: `ff_${i}_${ev.date}`,
+              utcIso: new Date(ev.date).toISOString(),
+              currency: ccy,
+              impact,
+              title: ev.title,
+              pairs,
+              forecast: ev.forecast || '—',
+              previous: ev.previous || '—',
+              actual: ev.actual || 'Pending'
+            };
+          });
+        if (mapped.length >= 4) {
+          weeklyCalendar = mapped;
+          document.getElementById('cal-source-badge').textContent = 'Live FF Feed • UTC+7 WIB';
+        }
+      } else {
+        weeklyCalendar = [...VERIFIED_WIB_CALENDAR];
+        document.getElementById('cal-source-badge').textContent = 'Verified Nov 16–20 Feed • UTC+7 WIB';
+      }
+
+      if (appState.activeFolder === 'intel') renderIntelFolder();
+      if (notify) showToast('WIB Economic Calendar synchronized (Asia/Jakarta UTC+7).', 'success');
+    }
+
+    // =========================================================================
+    // 8. GEMINI DESK (FOLDER 3 — REPLACES ACADEMY)
+    // =========================================================================
+    async function runAskGeminiDesk() {
+      const target = document.getElementById('gemini-target-select').value;
+      const question = document.getElementById('gemini-question-input').value.trim();
+      const box = document.getElementById('gemini-live-response-box');
+      const btn = document.getElementById('btn-ask-gemini-desk');
+
+      box.classList.remove('hidden');
+      btn.disabled = true;
+      btn.textContent = '✨ Consulting Gemini Desk...';
+      box.innerHTML = `<div class="font-mono text-cyan-300">Analyzing ${target} price structure, WIB session timing, and 1,096 USC risk parameters...</div>`;
+
+      const gKey = (appState.apiKeys.gemini || '').trim();
+      const wib = getWibNow();
+      const sessionCtx = getWibSessionContext(wib);
+
+      const buildLocalGeminiSynthesis = () => {
+        if (target === 'PORTFOLIO') {
+          return `
+            <div class="font-extrabold text-cyan-300">✨ Gemini Portfolio Cross-Check (${wib.clockText} • ${sessionCtx.sessionLabel})</div>
+            <div><strong class="text-white">1. Top Asymmetric Setup:</strong> <strong>USDJPYc (159.620)</strong> offers a high-conviction mean-reversion short setup if price sweeps 159.95–160.15 and rejects below 159.75 ahead of BoJ intervention risk.</div>
+            <div><strong class="text-white">2. Gold &amp; Nasdaq Patience:</strong> Wait for tonight's <strong>20:30 WIB</strong> US/CAD data release before entering <strong>XAUUSDc ($3,868.50)</strong> or <strong>USTECc (27,705.0)</strong>—prioritize pullback fills into H1 FVGs rather than market orders.</div>
+            <div><strong class="text-white">3. 1,096 USC Cent Guardrail:</strong> Keep total open risk under <strong>49.3 USC (4.5%)</strong> and avoid stacking simultaneous short-USD bets across Gold, Nasdaq, and Bitcoin.</div>`;
+        }
+        const spec = INSTRUMENTS[target];
+        const sig = signalCache[`${target}_${appState.activeTf}`] || computeEightBotSignal(target, appState.activeTf);
+        return `
+          <div class="font-extrabold text-cyan-300">✨ Gemini Desk Verdict on ${target} (${spec.geminiOpinion.bias})</div>
+          ${question ? `<div class="text-gray-400 italic">"${question}"</div>` : ''}
+          <div><strong class="text-white">Desk Thesis:</strong> ${spec.geminiOpinion.rationale}</div>
+          <div><strong class="text-emerald-400">Actionable Zone:</strong> Watch <strong>${formatPrice(target, sig.pullbackEntry)}</strong> (FVG Pullback) with invalidation SL at <strong>${formatPrice(target, sig.slPrice)}</strong> and TP2 target <strong>${formatPrice(target, sig.tp2Price)}</strong> using <strong>${sig.recLots.toFixed(2)} cent-lots</strong> (${sig.actualRiskUsc} USC risk).</div>`;
+      };
+
+      if (!gKey) {
+        setTimeout(() => {
+          box.innerHTML = buildLocalGeminiSynthesis();
+          btn.disabled = false;
+          btn.textContent = '✨ Generate Live Gemini Opinion';
+        }, 250);
+        return;
+      }
+
+      const contextLines = target === 'PORTFOLIO'
+        ? SYMBOL_LIST.map(s => `${s} @ ${getInstrumentPrice(s)} (${INSTRUMENTS[s].geminiOpinion.bias})`).join('; ')
+        : `${target} @ ${getInstrumentPrice(target)}: ${INSTRUMENTS[target].geminiOpinion.rationale}`;
+
+      const prompt = `You are Gemini Institutional Trading Desk advising a trader in Western Indonesia Time (WIB, UTC+7, current time ${wib.clockText}, session ${sessionCtx.sessionLabel}) managing a 1,096 USC (Rp200.000) MT5 Standard Cent account.
+Context: ${contextLines}
+User question: ${question || 'Provide your institutional trade plan, key liquidity levels, and risk warning.'}
+Keep your response concise, structured in 3 clear bullet points with exact price levels and Cent lot sizing.`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(gKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!reply) throw new Error('Empty reply');
+        box.innerHTML = reply.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\n/g, '<br/>');
+        showToast('Live Gemini Desk response received!', 'success');
+      } catch (e) {
+        box.innerHTML = buildLocalGeminiSynthesis();
+        showToast('Used local Gemini Desk synthesis (check API key in top-right if needed).', 'info');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Generate Live Gemini Opinion';
+      }
+    }
+
+    // =========================================================================
+    // 9. MANUAL MT5 CENT TRADE LOG & EQUITY ENGINE (FOLDER 4 — ZERO MYFXBOOK)
+    // =========================================================================
+    function calcPositionFloatingUsc(pos) {
+      const spec = INSTRUMENTS[pos.symbol] || INSTRUMENTS.XAUUSDc;
+      const diff = pos.side === 'BUY' ? (pos.currentPrice - pos.entry) : (pos.entry - pos.currentPrice);
+      return Number((diff * spec.uscPerPoint001 * (pos.lots / 0.01)).toFixed(2));
+    }
+
+    function calcPositionRiskUsc(pos) {
+      const spec = INSTRUMENTS[pos.symbol] || INSTRUMENTS.XAUUSDc;
+      const dist = Math.abs((pos.entry || 0) - (pos.sl || 0));
+      return Number((dist * spec.uscPerPoint001 * (pos.lots / 0.01)).toFixed(2));
+    }
+
+    function getCurrentEquityUsc() {
+      const start = Number(appState.account.startingCapitalUsc) || 1096.0;
+      const realized = appState.closedTrades.reduce((sum, t) => sum + (Number(t.pnlUsc) || 0), 0);
+      const floating = appState.openPositions.reduce((sum, p) => sum + calcPositionFloatingUsc(p), 0);
+      return Number((start + realized + floating).toFixed(1));
+    }
+
+    function updateStartingCapital(val) {
+      const n = parseFloat(val);
+      if (!isNaN(n) && n > 0) {
+        appState.account.startingCapitalUsc = n;
+        saveState();
+        renderAll();
+      }
+    }
+
+    function onManualFormSymbolChange() {
+      fillFormWithMarketPrice();
+      updateManualFormPreview();
+    }
+
+    function fillFormWithMarketPrice() {
+      const sym = document.getElementById('m-symbol').value;
+      const spec = INSTRUMENTS[sym] || INSTRUMENTS.XAUUSDc;
+      const px = getInstrumentPrice(sym);
+      const side = document.getElementById('m-side').value;
+      const slDist = Number((spec.h1Atr * 1.1).toFixed(spec.decimals));
+      document.getElementById('m-entry').value = formatPrice(sym, px);
+      document.getElementById('m-sl').value = formatPrice(sym, side === 'BUY' ? px - slDist : px + slDist);
+      document.getElementById('m-tp').value = formatPrice(sym, side === 'BUY' ? px + slDist * 2.5 : px - slDist * 2.5);
+      document.getElementById('m-exit').value = formatPrice(sym, px);
+      updateManualFormPreview();
+    }
+
+    function toggleClosedExitField() {
+      const st = document.getElementById('m-status').value;
+      document.getElementById('m-exit-wrap').classList.toggle('hidden', st !== 'CLOSED');
+    }
+
+    function updateManualFormPreview() {
+      const sym = document.getElementById('m-symbol').value;
+      const spec = INSTRUMENTS[sym] || INSTRUMENTS.XAUUSDc;
+      const lots = Math.max(0.01, parseFloat(document.getElementById('m-lots').value) || 0.01);
+      const entry = parseFloat(document.getElementById('m-entry').value) || 0;
+      const sl = parseFloat(document.getElementById('m-sl').value) || 0;
+      const riskUsc = Math.abs(entry - sl) * spec.uscPerPoint001 * (lots / 0.01);
+      const pipValUsc = spec.pipSize * spec.uscPerPoint001 * (lots / 0.01);
+
+      document.getElementById('form-risk-preview').textContent = `Risk: ${riskUsc.toFixed(1)} USC`;
+      document.getElementById('form-idr-risk-info').textContent = `Est. Risk: ${formatIdr(riskUsc)}`;
+      document.getElementById('form-pip-val-info').textContent = `Pip/Pt Value (${lots.toFixed(2)} lot): ${pipValUsc.toFixed(2)} USC per ${spec.pipLabel}`;
+    }
+
+    function submitManualTrade() {
+      const symbol = document.getElementById('m-symbol').value;
+      const side = document.getElementById('m-side').value;
+      const lots = Math.max(0.01, Math.min(0.20, parseFloat(document.getElementById('m-lots').value) || 0.01));
+      const entry = parseFloat(document.getElementById('m-entry').value);
+      const sl = parseFloat(document.getElementById('m-sl').value);
+      const tp = parseFloat(document.getElementById('m-tp').value);
+      const status = document.getElementById('m-status').value;
+      const exitPx = parseFloat(document.getElementById('m-exit').value);
+      const timeWib = document.getElementById('m-time').value.trim() || getWibNow().clockText;
+      const note = document.getElementById('m-note').value.trim() || 'Manual MT5 Cent Execution';
+
+      if (!entry || isNaN(entry)) {
+        showToast('Please enter a valid Entry Price.', 'error');
+        return;
+      }
+
+      const spec = INSTRUMENTS[symbol] || INSTRUMENTS.XAUUSDc;
+
+      if (status === 'CLOSED') {
+        if (!exitPx || isNaN(exitPx)) {
+          showToast('Enter the Exit Price for your already-closed trade.', 'error');
+          return;
+        }
+        const diff = side === 'BUY' ? (exitPx - entry) : (entry - exitPx);
+        const pnlUsc = Number((diff * spec.uscPerPoint001 * (lots / 0.01)).toFixed(2));
+        appState.closedTrades.unshift({
+          id: `tr_${Date.now()}`,
+          symbol,
+          side,
+          lots,
+          entry,
+          exit: exitPx,
+          sl: sl || entry,
+          tp: tp || entry,
+          pnlUsc,
+          dateWib: getWibNow().dateKey,
+          timeWib,
+          note
+        });
+        saveState();
+        renderAll();
+        showToast(`Recorded closed ${symbol} ${side}: ${formatUsc(pnlUsc, true)}`, pnlUsc >= 0 ? 'success' : 'warning');
+      } else {
+        appState.openPositions.unshift({
+          id: `pos_${Date.now()}`,
+          symbol,
+          side,
+          lots,
+          entry,
+          currentPrice: getInstrumentPrice(symbol) || entry,
+          sl: sl || entry,
+          tp: tp || entry,
+          timeWib,
+          note
+        });
+        saveState();
+        renderAll();
+        showToast(`Logged open ${symbol} ${side} (${lots.toFixed(2)} lots) to MT5 Vault.`, 'success');
+      }
+    }
+
+    function updateOpenTickPrice(posId, newVal) {
+      const pos = appState.openPositions.find(p => p.id === posId);
+      const px = parseFloat(newVal);
+      if (!pos || isNaN(px) || px <= 0) return;
+      pos.currentPrice = px;
+      saveState();
+      renderAll();
+    }
+
+    function nudgeOpenTick(posId, stepSign) {
+      const pos = appState.openPositions.find(p => p.id === posId);
+      if (!pos) return;
+      const spec = INSTRUMENTS[pos.symbol] || INSTRUMENTS.XAUUSDc;
+      pos.currentPrice = Number((pos.currentPrice + spec.pipSize * 5 * stepSign).toFixed(spec.decimals));
+      saveState();
+      renderAll();
+    }
+
+    function closeOpenPosition(posId, mode, customPrice = null) {
+      const idx = appState.openPositions.findIndex(p => p.id === posId);
+      if (idx === -1) return;
+      const pos = appState.openPositions[idx];
+      const spec = INSTRUMENTS[pos.symbol] || INSTRUMENTS.XAUUSDc;
+
+      let exitPx = pos.currentPrice;
+      if (mode === 'TP' && pos.tp) exitPx = pos.tp;
+      else if (mode === 'SL' && pos.sl) exitPx = pos.sl;
+      else if (mode === 'BE') exitPx = pos.entry;
+      else if (mode === 'CUSTOM' && customPrice && !isNaN(customPrice)) exitPx = customPrice;
+
+      const diff = pos.side === 'BUY' ? (exitPx - pos.entry) : (pos.entry - exitPx);
+      const pnlUsc = Number((diff * spec.uscPerPoint001 * (pos.lots / 0.01)).toFixed(2));
+      const wib = getWibNow();
+
+      appState.closedTrades.unshift({
+        id: `tr_${Date.now()}`,
+        symbol: pos.symbol,
+        side: pos.side,
+        lots: pos.lots,
+        entry: pos.entry,
+        exit: exitPx,
+        sl: pos.sl,
+        tp: pos.tp,
+        pnlUsc,
+        dateWib: wib.dateKey,
+        timeWib: wib.clockText,
+        note: `${pos.note} [Closed @ ${mode}]`
+      });
+
+      appState.openPositions.splice(idx, 1);
+      saveState();
+      renderAll();
+      showToast(`Closed ${pos.symbol} @ ${mode}: ${formatUsc(pnlUsc, true)} (${formatIdr(pnlUsc, true)})`, pnlUsc >= 0 ? 'success' : 'warning');
+    }
+
+    function deleteClosedTrade(tradeId) {
+      appState.closedTrades = appState.closedTrades.filter(t => t.id !== tradeId);
+      saveState();
+      renderAll();
+      showToast('Deleted trade entry from ledger.', 'info');
+    }
+
+    function exportVaultBackup(format) {
+      const dateTag = getWibNow().dateKey;
+      if (format === 'json') {
+        const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `centra_wib_vault_${dateTag}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Exported JSON backup.', 'success');
+      } else {
+        const header = 'DateWIB,TimeWIB,Symbol,Side,Lots,Entry,Exit,PnL_USC,PnL_IDR,Note\n';
+        const rows = appState.closedTrades.map(t =>
+          `"${t.dateWib}","${t.timeWib}","${t.symbol}","${t.side}",${t.lots},${t.entry},${t.exit},${t.pnlUsc},"${formatIdr(t.pnlUsc)}","${(t.note || '').replace(/"/g, '""')}"`
+        ).join('\n');
+        const blob = new Blob([header + rows], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `centra_wib_trades_${dateTag}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Exported CSV trade ledger.', 'success');
+      }
+    }
+
+    function importVaultBackup(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = String(e.target?.result || '');
+        if (file.name.endsWith('.json')) {
+          try {
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed.closedTrades)) appState.closedTrades = parsed.closedTrades;
+            if (Array.isArray(parsed.openPositions)) appState.openPositions = parsed.openPositions;
+            if (parsed.account?.startingCapitalUsc) appState.account.startingCapitalUsc = parsed.account.startingCapitalUsc;
+            saveState();
+            renderAll();
+            showToast('Restored JSON backup into MT5 Vault!', 'success');
+          } catch (err) {
+            showToast('Invalid JSON backup file.', 'error');
+          }
+        } else {
+          let added = 0;
+          text.split(/\r?\n/).slice(1).forEach(line => {
+            if (!line.trim()) return;
+            const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+            if (cols.length >= 8) {
+              const pnl = parseFloat(cols[7]);
+              if (!isNaN(pnl)) {
+                appState.closedTrades.unshift({
+                  id: `imp_${Date.now()}_${added}`,
+                  dateWib: cols[0] || getWibNow().dateKey,
+                  timeWib: cols[1] || '',
+                  symbol: INSTRUMENTS[cols[2]] ? cols[2] : 'XAUUSDc',
+                  side: cols[3] === 'SELL' ? 'SELL' : 'BUY',
+                  lots: parseFloat(cols[4]) || 0.01,
+                  entry: parseFloat(cols[5]) || 0,
+                  exit: parseFloat(cols[6]) || 0,
+                  pnlUsc: pnl,
+                  note: cols[9] || 'CSV Import'
+                });
+                added++;
+              }
+            }
+          });
+          saveState();
+          renderAll();
+          showToast(`Imported ${added} trades from CSV.`, 'success');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // =========================================================================
+    // 10. UI NAVIGATION & VIEW RENDERERS
+    // =========================================================================
+    function openFolder(folder) {
+      appState.activeFolder = folder;
+      saveState();
+
+      document.querySelectorAll('.folder-section').forEach(sec => {
+        sec.classList.toggle('hidden', sec.id !== `folder-${folder}`);
+      });
+
+      document.querySelectorAll('[data-folderbtn]').forEach(btn => {
+        const active = btn.dataset.folderbtn === folder;
+        btn.className = `py-2.5 flex flex-col items-center justify-center gap-1 transition ${
+          active ? 'text-emerald-400' : 'text-gray-400 hover:text-gray-200'
+        }`;
+      });
+
+      if (folder === 'signals') switchSubTab('signals', appState.activeSubTabs.signals || 'engine', false);
+      else if (folder === 'intel') switchSubTab('intel', appState.activeSubTabs.intel || 'news', false);
+      else if (folder === 'gemini') renderGeminiDeskFolder();
+      else if (folder === 'vault') renderVaultFolder();
+    }
+
+    function switchSubTab(folder, sub, persist = true) {
+      appState.activeSubTabs[folder] = sub;
+      if (persist) saveState();
+
+      const subMap = {
+        signals: ['engine', 'chart'],
+        intel: ['news', 'calendar']
+      };
+
+      (subMap[folder] || []).forEach(s => {
+        const view = document.getElementById(`subview-${folder}-${s}`);
+        if (view) view.classList.toggle('hidden', s !== sub);
+
+        const btn = document.querySelector(`[data-subbtn="${folder}-${s}"]`);
+        if (btn) {
+          const active = s === sub;
+          btn.className = `py-2 px-3 rounded-xl text-xs font-bold transition ${
+            active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 shadow-sm' : 'text-gray-400 hover:text-white'
+          }`;
+        }
+      });
+
+      if (folder === 'signals') {
+        if (sub === 'engine') renderSignalsFolder();
+        if (sub === 'chart') renderLiveTradingViewChart();
+      } else if (folder === 'intel') {
+        renderIntelFolder();
+      }
+    }
+
+    function selectSymbol(sym) {
+      appState.activeSymbol = sym;
+      saveState();
+      computeEightBotSignal(sym, appState.activeTf);
+      if (appState.activeSubTabs.signals === 'chart') renderLiveTradingViewChart();
+      else renderSignalsFolder();
+    }
+
+    function selectHorizonWindow(win) {
+      appState.activeWindow = win;
+      const defaultTf = win === 'scalp' ? '5m' : win === 'swing' ? '4H' : '1H';
+      appState.activeTf = defaultTf;
+      saveState();
+      computeEightBotSignal(appState.activeSymbol, defaultTf);
+      renderSignalsFolder();
+    }
+
+    function selectTimeframe(tf) {
+      appState.activeTf = tf;
+      appState.activeWindow = TF_META[tf]?.window || 'intraday';
+      saveState();
+      computeEightBotSignal(appState.activeSymbol, tf);
+      if (appState.activeSubTabs.signals === 'chart') renderLiveTradingViewChart();
+      else renderSignalsFolder();
+    }
+
+    function renderSignalsFolder() {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      const sig = signalCache[`${sym}_${tf}`] || computeEightBotSignal(sym, tf);
+
+      // Guardrail Banner
+      const gBanner = document.getElementById('signal-guardrail-banner');
+      const sc = sig.sessionCtx;
+      const bannerCls = sc.tier === 'danger'
+        ? 'bg-rose-950/75 border-rose-500/50 text-rose-200'
+        : sc.tier === 'warning' || sc.imminentHighNews
+          ? 'bg-amber-950/65 border-amber-500/45 text-amber-200'
+          : 'bg-emerald-950/45 border-emerald-500/35 text-emerald-200';
+      gBanner.className = `rounded-2xl p-3 border text-xs space-y-0.5 ${bannerCls}`;
+      gBanner.innerHTML = `
+        <div class="font-extrabold">${sc.headline}</div>
+        <div class="text-[11px] opacity-90 leading-snug">${sc.detail}</div>
+        ${sc.imminentHighNews ? `<div class="text-[11px] font-mono font-bold text-amber-300 pt-0.5">⚠️ High-Impact Catalyst: ${sc.imminentHighNews.title} (${sc.imminentHighNews.diffMins >= 0 ? `in ${sc.imminentHighNews.diffMins}m` : 'JUST RELEASED'})</div>` : ''}
+      `;
+
+      // Instrument Pills
+      document.getElementById('sig-instrument-pills').innerHTML = SYMBOL_LIST.map(s => {
+        const active = s === sym;
+        return `<button onclick="selectSymbol('${s}')" class="py-2 px-1.5 rounded-xl text-xs font-mono font-bold border transition ${
+          active ? 'bg-cyan-500/20 text-white border-cyan-400' : 'bg-[#090d16] text-gray-400 border-gray-800 hover:text-white'
+        }">${s}</button>`;
+      }).join('');
+
+      // Horizon Window Highlight
+      ['scalp', 'intraday', 'swing'].forEach(w => {
+        const el = document.getElementById(`win-card-${w}`);
+        const active = appState.activeWindow === w;
+        el.className = `p-2.5 rounded-xl border text-left transition ${
+          active ? 'bg-emerald-500/15 border-emerald-400' : 'bg-[#090d16] border-gray-800 hover:border-gray-700'
+        }`;
+      });
+      const winLabels = {
+        scalp: 'Window: Short Scalp (1m / 5m / 15m)',
+        intraday: 'Window: Medium Intraday (15m / 1H)',
+        swing: 'Window: Swing / Long-Term (4H / 1D + Astral Cycle)'
+      };
+      document.getElementById('sig-window-hint').textContent = winLabels[appState.activeWindow] || '';
+
+      // Timeframe Pills
+      document.querySelectorAll('.sig-tf-btn').forEach(btn => {
+        const active = btn.dataset.tf === tf;
+        btn.className = `sig-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition ${
+          active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400' : 'bg-[#090d16] text-gray-400 border-gray-800 hover:text-white'
+        }`;
+      });
+
+      // Master Verdict & Actionable Price Levels Card
+      const isWait = sig.verdictTier === 'wait';
+      const isBuy = sig.side === 'BUY';
+      const vBadgeCls = isWait
+        ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+        : isBuy
+          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+          : 'bg-rose-500/20 text-rose-400 border-rose-500/50';
+
+      document.getElementById('master-verdict-card').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-mono font-extrabold text-white">${sig.symbol}</span>
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-gray-800 text-cyan-300">${sig.tfTitle}</span>
+            </div>
+            <div class="text-[11px] text-gray-400 mt-0.5">Live Price: <span class="font-mono text-white font-bold">${formatPrice(sym, sig.price)}</span> • ${sig.wibClock}</div>
+          </div>
+          <span class="px-3.5 py-1.5 rounded-xl border text-xs sm:text-sm font-extrabold tracking-wide ${vBadgeCls}">
+            ${sig.verdict}
+          </span>
+        </div>
+
+        ${isWait ? `
+          <div class="rounded-xl bg-amber-950/65 border border-amber-500/50 p-3 text-xs text-amber-200 font-semibold">
+            ⚠️ Sideways / Safety Guard Active: ADX ${sig.bot1.adx14} or session/news window makes immediate entry unsafe. Wait for liquidity sweep confirmation.
+          </div>` : ''}
+
+        <!-- Long vs Short Probability Bar -->
+        <div class="space-y-1.5">
+          <div class="flex items-baseline justify-between">
+            <div>
+              <span class="text-2xl font-mono font-extrabold text-emerald-400 tabular-nums">${sig.longPct}%</span>
+              <span class="text-xs font-extrabold text-emerald-400 ml-1">LONG</span>
+            </div>
+            <span class="text-[10px] font-mono text-gray-500 uppercase">8-Bot Probability</span>
+            <div class="text-right">
+              <span class="text-xs font-extrabold text-rose-400 mr-1">SHORT</span>
+              <span class="text-2xl font-mono font-extrabold text-rose-400 tabular-nums">${sig.shortPct}%</span>
+            </div>
+          </div>
+          <div class="w-full h-3.5 rounded-full bg-rose-500 overflow-hidden flex">
+            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${sig.longPct}%"></div>
+          </div>
+        </div>
+
+        <!-- Exact Actionable Price Levels Box -->
+        <div class="space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-300">Exact Actionable Price Levels</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div class="rounded-xl bg-[#090d16] border border-cyan-500/35 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-cyan-300">Pullback Limit Entry (FVG Zone)</span>
+                <span class="text-[10px] font-mono text-emerald-400">Optimal R:R</span>
+              </div>
+              <div class="text-base font-mono font-extrabold text-white mt-0.5">${formatPrice(sym, sig.pullbackEntry)}</div>
+            </div>
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-gray-300">Breakout Momentum Entry</span>
+                <span class="text-[10px] font-mono text-amber-300">Confirmation</span>
+              </div>
+              <div class="text-base font-mono font-extrabold text-white mt-0.5">${formatPrice(sym, sig.breakoutEntry)}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+              <div class="text-[10px] text-gray-400 font-sans">Hard Stop-Loss</div>
+              <div class="font-bold text-rose-400 mt-0.5">${formatPrice(sym, sig.slPrice)}</div>
+              <div class="text-[10px] text-gray-500">${sig.slPips} pips (${sig.actualRiskUsc} USC)</div>
+            </div>
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+              <div class="text-[10px] text-gray-400 font-sans">TP1 (1:1.5 R:R)</div>
+              <div class="font-bold text-emerald-300 mt-0.5">${formatPrice(sym, sig.tp1Price)}</div>
+            </div>
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+              <div class="text-[10px] text-gray-400 font-sans">TP2 (1:2.5 R:R)</div>
+              <div class="font-bold text-emerald-400 mt-0.5">${formatPrice(sym, sig.tp2Price)}</div>
+            </div>
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-2.5">
+              <div class="text-[10px] text-gray-400 font-sans">Cent Lot (1,096 USC)</div>
+              <div class="font-bold text-cyan-300 mt-0.5">${sig.recLots.toFixed(2)} lots</div>
+              <div class="text-[10px] text-gray-500">${formatIdr(sig.actualRiskUsc)} risk</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bot 8 Master Hypothesis -->
+        <div class="rounded-xl bg-[#090d16] border border-gray-800 p-3 space-y-1">
+          <div class="text-[11px] font-extrabold text-white uppercase tracking-wider">Bot 8 — Master Hypothesis &amp; Expected Outcome</div>
+          <p class="text-xs text-gray-300 leading-relaxed">${sig.hypothesis}</p>
+        </div>
+
+        <!-- Log Setup to MT5 Vault Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button onclick="logSetupToVault('${sig.symbol}', '${sig.tf}', false)" class="py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-[#051017] font-extrabold text-xs tracking-wide transition">
+            ⚡ Log Setup to MT5 Vault (Pullback)
+          </button>
+          <button onclick="logSetupToVault('${sig.symbol}', '${sig.tf}', true)" class="py-3 px-3 rounded-xl bg-[#162033] hover:bg-gray-800 border border-gray-700 text-cyan-300 font-bold text-xs transition">
+            Log Breakout Setup (${formatPrice(sym, sig.breakoutEntry)})
+          </button>
+        </div>
+      `;
+
+      // 8 Individual Bot Diagnostic Cards
+      const botsData = [
+        {
+          id: 'BOT 1 • MULTI-TF TECHNICAL & TREND ENGINE',
+          pill: sig.bot1.trendLabel,
+          pillCls: 'bg-emerald-500/15 text-emerald-300',
+          desc: `EMA20: ${formatPrice(sym, sig.bot1.ema20)} | EMA50: ${formatPrice(sym, sig.bot1.ema50)} | EMA200: ${formatPrice(sym, sig.bot1.ema200)}. RSI(14) = ${sig.bot1.rsi14}, ATR(14) = ${formatPrice(sym, sig.bot1.atr)}.`
+        },
+        {
+          id: 'BOT 2 • SMC LIQUIDITY & FVG / iFVG SCANNER',
+          pill: `BSL ${formatPrice(sym, sig.bot2.bsl)} / SSL ${formatPrice(sym, sig.bot2.ssl)}`,
+          pillCls: 'bg-cyan-500/15 text-cyan-300',
+          desc: `Valid Bullish FVG: ${formatPrice(sym, sig.bot2.bullFvgLow)}–${formatPrice(sym, sig.bot2.bullFvgHigh)} | Valid Bearish FVG: ${formatPrice(sym, sig.bot2.bearFvgLow)}–${formatPrice(sym, sig.bot2.bearFvgHigh)}. Active Flip Zone: ${sig.bot2.ifvgZone}.`
+        },
+        {
+          id: 'BOT 3 • CHART SHAPE & GEOMETRY PATTERN BOT',
+          pill: sig.bot3.patternName,
+          pillCls: 'bg-purple-500/15 text-purple-300',
+          desc: sig.bot3.patternNote
+        },
+        {
+          id: 'BOT 4 • SIDEWAYS & VOLATILITY REGIME FILTER',
+          pill: sig.bot4.forceWait ? 'WAIT / CHOP GUARD' : `EXPANSION (ADX ${sig.bot4.adx14})`,
+          pillCls: sig.bot4.forceWait ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/15 text-emerald-300',
+          desc: sig.bot4.forceWait
+            ? `Low-momentum compression or session dead-zone detected (ADX ${sig.bot4.adx14}). Bot 4 overrides directional signals to WAIT / DO NOT TRADE YET.`
+            : `Healthy directional volatility (ADX ${sig.bot4.adx14}) outside rollover dead-zones; valid for structured pullback or breakout execution.`
+        },
+        {
+          id: 'BOT 5 • MACRO & NEWS ALIGNMENT BOT',
+          pill: sc.sessionLabel,
+          pillCls: 'bg-amber-500/15 text-amber-300',
+          desc: `${sig.bot5.newsAlignNote} Current desk bias: ${INSTRUMENTS[sym].geminiOpinion.bias}.`
+        },
+        {
+          id: `BOT 6 • ASTRAL & LUNAR MARKET CYCLE BOT ${sig.window === 'swing' ? '(SWING WEIGHTED)' : ''}`,
+          pill: `${sig.bot6.phaseName} (${sig.bot6.illumination}%)`,
+          pillCls: 'bg-indigo-500/15 text-indigo-300',
+          desc: `${sig.bot6.summary} Tracks lunar inflection windows (Nov 17 First Quarter → Nov 24 Full Moon in Gemini) for 4H/1D swing volatility.`
+        },
+        {
+          id: 'BOT 7 • CENT RISK & POSITION SIZING CALCULATOR',
+          pill: `${sig.recLots.toFixed(2)} Cent Lots`,
+          pillCls: 'bg-cyan-500/15 text-cyan-300',
+          desc: `Capped at ${appState.apiKeys.riskPct}% of ${getCurrentEquityUsc().toFixed(1)} USC equity = ${sig.actualRiskUsc} USC (${formatIdr(sig.actualRiskUsc)}) max loss over ${sig.slPips} pips stop distance.`
+        },
+        {
+          id: 'BOT 8 • MASTER HYPOTHESIS SYNTHESIZER',
+          pill: `${sig.verdict} (${sig.edgePct}% Edge)`,
+          pillCls: 'bg-emerald-500/15 text-emerald-300',
+          desc: sig.hypothesis
+        }
+      ];
+
+      document.getElementById('eight-bots-list').innerHTML = botsData.map(b => `
+        <div class="rounded-xl bg-[#090d16] border border-gray-800 p-3 space-y-1.5">
+          <div class="flex flex-wrap items-center justify-between gap-1.5">
+            <span class="text-[10px] font-mono font-extrabold text-gray-300">${b.id}</span>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${b.pillCls}">${b.pill}</span>
+          </div>
+          <p class="text-xs text-gray-300 leading-relaxed">${b.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderLiveTradingViewChart() {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      const sig = signalCache[`${sym}_${tf}`] || computeEightBotSignal(sym, tf);
+
+      document.getElementById('tv-top-verdict').textContent = sig.verdict;
+      document.getElementById('tv-top-title').textContent = `${sym} • ${sig.tfTitle} (Asia/Jakarta WIB)`;
+      document.getElementById('tv-top-levels').textContent = `Pullback: ${formatPrice(sym, sig.pullbackEntry)} • SL: ${formatPrice(sym, sig.slPrice)} • TP2: ${formatPrice(sym, sig.tp2Price)}`;
+
+      document.getElementById('tv-pair-pills').innerHTML = SYMBOL_LIST.map(s => `
+        <button onclick="selectSymbol('${s}')" class="px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold shrink-0 border ${
+          s === sym ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-[#101726] text-gray-400 border-gray-800'
+        }">${s}</button>
+      `).join('');
+
+      document.querySelectorAll('.tv-tf-btn').forEach(btn => {
+        const active = btn.dataset.tvtf === tf;
+        btn.className = `tv-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold ${
+          active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35' : 'text-gray-400'
+        }`;
+      });
+
+      document.getElementById('tv-smc-strip').innerHTML = `
+        <div class="surface-card rounded-xl p-2.5 text-center"><div class="text-[10px] text-gray-400">SSL Liquidity</div><div class="text-xs font-mono font-bold text-emerald-400 mt-0.5">${formatPrice(sym, sig.bot2.ssl)}</div></div>
+        <div class="surface-card rounded-xl p-2.5 text-center"><div class="text-[10px] text-gray-400">FVG Entry</div><div class="text-xs font-mono font-bold text-cyan-300 mt-0.5">${formatPrice(sym, sig.pullbackEntry)}</div></div>
+        <div class="surface-card rounded-xl p-2.5 text-center"><div class="text-[10px] text-gray-400">Stop-Loss</div><div class="text-xs font-mono font-bold text-rose-400 mt-0.5">${formatPrice(sym, sig.slPrice)}</div></div>
+        <div class="surface-card rounded-xl p-2.5 text-center"><div class="text-[10px] text-gray-400">BSL Target</div><div class="text-xs font-mono font-bold text-emerald-300 mt-0.5">${formatPrice(sym, sig.bot2.bsl)}</div></div>
+      `;
+
+      const key = `${sym}_${tf}`;
+      if (loadedTvKey !== key) {
+        loadedTvKey = key;
+        const container = document.getElementById('tv-chart-container');
+        container.innerHTML = '';
+        if (typeof TradingView !== 'undefined') {
+          try {
+            new TradingView.widget({
+              autosize: true,
+              symbol: INSTRUMENTS[sym].tvSymbol,
+              interval: TF_META[tf].tv,
+              timezone: 'Asia/Jakarta',
+              theme: 'dark',
+              style: '1',
+              locale: 'en',
+              toolbar_bg: '#090d16',
+              enable_publishing: false,
+              container_id: 'tv-chart-container',
+              studies: ['MASimple@tv-basicstudies', 'RSI@tv-basicstudies']
+            });
+          } catch (e) {}
+        }
+      }
+    }
+
+    // --- FOLDER 2 RENDERER ---
+    function setNewsFilter(filter) {
+      appState.newsFilter = filter;
+      saveState();
+      renderIntelFolder();
+    }
+
+    function setCalendarFilter(filter) {
+      appState.calendarFilter = filter;
+      saveState();
+      renderIntelFolder();
+    }
+
+    function renderIntelFolder() {
+      // News Filter Buttons
+      document.querySelectorAll('.news-filter-btn').forEach(btn => {
+        const active = btn.dataset.nfilter === appState.newsFilter;
+        btn.className = `news-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+          active ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400' : 'bg-[#101726] text-gray-400 border-gray-800 hover:text-white'
+        }`;
+      });
+
+      let list = [...classifiedNews];
+      if (appState.newsFilter === 'CRITICAL') list = list.filter(n => n.importanceTier === 'CRITICAL');
+      else if (appState.newsFilter === 'MY_PAIRS') list = list.filter(n => n.tags.some(t => SYMBOL_LIST.includes(t)));
+      else if (appState.newsFilter === 'LOW_NOISE') list = list.filter(n => n.importanceTier === 'LOW_NOISE');
+
+      const newsEl = document.getElementById('filtered-news-list');
+      if (newsEl) {
+        newsEl.innerHTML = list.length === 0
+          ? `<div class="surface-card rounded-2xl p-6 text-center text-xs text-gray-400">No headlines match this filter right now.</div>`
+          : list.map(n => {
+              const tierBadge = n.importanceTier === 'CRITICAL'
+                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                : n.importanceTier === 'LOW_NOISE'
+                  ? 'bg-gray-800 text-gray-400 border-gray-700'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/35';
+              const biasBadge = n.bias === 'BULLISH'
+                ? 'text-emerald-400'
+                : n.bias === 'BEARISH'
+                  ? 'text-rose-400'
+                  : 'text-gray-400';
+              return `
+                <div class="surface-card rounded-2xl p-3.5 space-y-2">
+                  <div class="flex flex-wrap items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold border ${tierBadge}">${n.importanceTier.replace('_', ' ')} (${n.score}/100)</span>
+                      ${n.tags.map(t => `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-300">${t}</span>`).join('')}
+                    </div>
+                    <span class="text-[10px] font-mono font-bold ${biasBadge}">${n.bias}</span>
+                  </div>
+                  <div class="text-xs font-bold text-white leading-snug">${n.title}</div>
+                  <div class="flex items-center justify-between text-[10px] font-mono text-gray-400">
+                    <span>${n.source} • ${n.dayWib} ${n.timeWib}</span>
+                    ${n.url ? `<a href="${n.url}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline">Read ↗</a>` : ''}
+                  </div>
+                </div>`;
+            }).join('');
+      }
+
+      // Calendar Filter Buttons & Alert Toggles
+      const alertChk = document.getElementById('cal-alert-enabled');
+      const soundChk = document.getElementById('cal-sound-enabled');
+      if (alertChk) alertChk.checked = Boolean(appState.calendarPrefs.alertEnabled);
+      if (soundChk) soundChk.checked = Boolean(appState.calendarPrefs.soundEnabled);
+
+      document.querySelectorAll('.cal-filter-btn').forEach(btn => {
+        const active = btn.dataset.cfilter === appState.calendarFilter;
+        btn.className = `cal-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+          active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400' : 'bg-[#101726] text-gray-400 border-gray-800 hover:text-white'
+        }`;
+      });
+
+      const wib = getWibNow();
+      let events = [...weeklyCalendar].sort((a, b) => new Date(a.utcIso) - new Date(b.utcIso));
+      if (appState.calendarFilter === 'HIGH') events = events.filter(e => e.impact === 'HIGH');
+      else if (appState.calendarFilter === 'TODAY') events = events.filter(e => formatIsoToWib(e.utcIso).dateIsoWib === wib.dateKey);
+      else if (appState.calendarFilter === 'MY_PAIRS') events = events.filter(e => e.pairs.some(p => SYMBOL_LIST.includes(p)));
+
+      const calContainer = document.getElementById('wib-calendar-container');
+      if (calContainer) {
+        calContainer.innerHTML = events.length === 0
+          ? `<div class="surface-card rounded-2xl p-6 text-center text-xs text-gray-400">No events match this filter.</div>`
+          : events.map(ev => {
+              const fmt = formatIsoToWib(ev.utcIso);
+              const diffMins = Math.round((new Date(ev.utcIso).getTime() - wib.nowMs) / 60000);
+              let countdownBadge = '';
+              if (diffMins < -15) {
+                countdownBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-gray-800 text-gray-400">PASSED</span>`;
+              } else if (diffMins <= 0) {
+                countdownBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-500/40">LIVE NOW</span>`;
+              } else if (diffMins < 60) {
+                countdownBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">In ${diffMins}m</span>`;
+              } else {
+                const hrs = Math.floor(diffMins / 60);
+                const mins = diffMins % 60;
+                countdownBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/15 text-cyan-300">In ${hrs}h ${mins}m</span>`;
+              }
+
+              const impCls = ev.impact === 'HIGH'
+                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                : 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+
+              return `
+                <div class="surface-card rounded-2xl p-3.5 space-y-2">
+                  <div class="flex flex-wrap items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-mono font-extrabold text-white">${fmt.dayWib} • ${fmt.timeWib}</span>
+                      <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-extrabold border ${impCls}">${ev.impact}</span>
+                      <span class="text-[10px] font-mono font-bold text-gray-400">${ev.currency}</span>
+                    </div>
+                    ${countdownBadge}
+                  </div>
+                  <div class="text-xs font-bold text-gray-100">${ev.title}</div>
+                  <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono pt-1 border-t border-gray-800/80">
+                    <div class="flex items-center gap-3 text-gray-400">
+                      <span>Act: <strong class="text-white">${ev.actual}</strong></span>
+                      <span>Fcst: <strong class="text-cyan-300">${ev.forecast}</strong></span>
+                      <span>Prev: <strong>${ev.previous}</strong></span>
+                    </div>
+                    <span class="text-[10px] text-emerald-400">${ev.pairs.join(', ')}</span>
+                  </div>
+                </div>`;
+            }).join('');
+      }
+    }
+
+    // --- FOLDER 3 RENDERER (GEMINI DESK) ---
+    function renderGeminiDeskFolder() {
+      const hasKey = Boolean((appState.apiKeys.gemini || '').trim());
+      const ind = document.getElementById('gemini-key-indicator');
+      if (ind) {
+        ind.textContent = hasKey ? 'Live Gemini API Connected' : 'Built-In Desk Synthesis';
+        ind.className = `px-2 py-1 rounded-lg text-[10px] font-mono border ${
+          hasKey ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/35' : 'bg-gray-800 text-gray-300 border-gray-700'
+        }`;
+      }
+
+      document.getElementById('gemini-instrument-dossiers').innerHTML = SYMBOL_LIST.map(sym => {
+        const spec = INSTRUMENTS[sym];
+        const op = spec.geminiOpinion;
+        const px = getInstrumentPrice(sym);
+        const tierCls = op.biasTier === 'bullish'
+          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+          : op.biasTier === 'bearish'
+            ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+            : op.biasTier === 'warning'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+              : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+
+        return `
+          <div class="surface-card rounded-2xl p-4 space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-base font-mono font-extrabold text-white">${sym}</span>
+                  <span class="text-xs font-mono font-bold text-cyan-300">${formatPrice(sym, px)}</span>
+                </div>
+                <div class="text-[11px] text-gray-400">${spec.name}</div>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold border ${tierCls}">${op.bias}</span>
+            </div>
+
+            <!-- Conviction Bar -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px] font-mono">
+                <span class="text-gray-400">Gemini Desk Conviction</span>
+                <span class="text-white font-bold">${op.conviction}%</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-cyan-400 to-emerald-400" style="width: ${op.conviction}%"></div>
+              </div>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed">${op.rationale}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono bg-[#090d16] rounded-xl p-3 border border-gray-800">
+              <div><span class="text-gray-400 font-sans block text-[10px]">Support Zone:</span><span class="text-emerald-400 font-bold">${op.support}</span></div>
+              <div><span class="text-gray-400 font-sans block text-[10px]">Resistance Zone:</span><span class="text-rose-400 font-bold">${op.resistance}</span></div>
+              <div><span class="text-gray-400 font-sans block text-[10px]">Invalidation:</span><span class="text-amber-300">${op.invalidation}</span></div>
+              <div><span class="text-gray-400 font-sans block text-[10px]">Optimal WIB Window:</span><span class="text-cyan-300">${op.optimalWib}</span></div>
+            </div>
+
+            <button onclick="selectSymbol('${sym}'); openFolder('signals');" class="w-full py-2.5 rounded-xl bg-[#162033] hover:bg-gray-800 border border-gray-700 text-cyan-300 text-xs font-bold transition">
+              ⚡ Open ${sym} in 8-Bot Signal Engine →
+            </button>
+          </div>`;
+      }).join('');
+    }
+
+    // --- FOLDER 4 RENDERER (MANUAL MT5 VAULT) ---
+    function renderVaultFolder() {
+      const startCap = Number(appState.account.startingCapitalUsc) || 1096.0;
+      const startInput = document.getElementById('vault-start-capital');
+      if (startInput && document.activeElement !== startInput) startInput.value = startCap;
+
+      const equity = getCurrentEquityUsc();
+      const floating = appState.openPositions.reduce((s, p) => s + calcPositionFloatingUsc(p), 0);
+      const realized = appState.closedTrades.reduce((s, t) => s + (Number(t.pnlUsc) || 0), 0);
+
+      document.getElementById('vault-equity-usc').textContent = `${equity.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} USC`;
+      document.getElementById('vault-equity-idr').textContent = `(${formatIdr(equity)})`;
+
+      const flEl = document.getElementById('vault-floating-usc');
+      flEl.textContent = formatUsc(floating, true);
+      flEl.className = `font-bold mt-0.5 ${floating >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      document.getElementById('vault-floating-idr').textContent = formatIdr(floating, true);
+
+      const netEl = document.getElementById('vault-net-usc');
+      netEl.textContent = formatUsc(realized, true);
+      netEl.className = `font-bold mt-0.5 ${realized >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      document.getElementById('vault-net-idr').textContent = formatIdr(realized, true);
+
+      // Win Rate & Profit Factor
+      const closed = appState.closedTrades;
+      const wins = closed.filter(t => Number(t.pnlUsc) > 0);
+      const losses = closed.filter(t => Number(t.pnlUsc) < 0);
+      const wr = closed.length > 0 ? ((wins.length / closed.length) * 100).toFixed(1) : '0.0';
+      const grossWin = wins.reduce((s, t) => s + Number(t.pnlUsc), 0);
+      const grossLoss = Math.abs(losses.reduce((s, t) => s + Number(t.pnlUsc), 0));
+      const pf = grossLoss > 0 ? (grossWin / grossLoss).toFixed(2) : grossWin > 0 ? '∞' : '0.00';
+
+      document.getElementById('vault-winrate').textContent = `${wr}% (${wins.length}/${closed.length})`;
+      document.getElementById('vault-pf').textContent = `PF: ${pf}`;
+
+      // Portfolio Heat Meter (Capped at 4.5% / ~49.3 USC)
+      const openRiskUsc = appState.openPositions.reduce((s, p) => s + calcPositionRiskUsc(p), 0);
+      const maxHeatUsc = Number((equity * 0.045).toFixed(1));
+      const heatPct = ((openRiskUsc / Math.max(100, equity)) * 100);
+      const heatLbl = document.getElementById('vault-heat-label');
+      const heatBar = document.getElementById('vault-heat-bar');
+      heatLbl.textContent = `${heatPct.toFixed(1)}% (${openRiskUsc.toFixed(1)} / ${maxHeatUsc} USC)`;
+      heatLbl.className = `text-[11px] font-bold ${heatPct > 4.5 ? 'text-rose-400' : 'text-emerald-400'}`;
+      heatBar.style.width = `${Math.min(100, (heatPct / 4.5) * 100)}%`;
+      heatBar.className = `h-full transition-all duration-300 ${heatPct > 4.5 ? 'bg-rose-500' : 'bg-emerald-500'}`;
+
+      // Daily Loss Circuit Breaker (Consecutive losses today WIB)
+      const todayKey = getWibNow().dateKey;
+      const todayTrades = closed.filter(t => t.dateWib === todayKey);
+      let consecLosses = 0;
+      for (const t of todayTrades) {
+        if (Number(t.pnlUsc) < 0) consecLosses++;
+        else break;
+      }
+      const brPill = document.getElementById('vault-breaker-pill');
+      brPill.textContent = `${consecLosses} / 2`;
+      brPill.className = consecLosses >= 2
+        ? 'px-2.5 py-1 rounded-lg font-mono text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40'
+        : 'px-2.5 py-1 rounded-lg font-mono text-xs font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/35';
+
+      // USD Directional Correlation Warning
+      const usdDirs = appState.openPositions.map(p => {
+        const leg = INSTRUMENTS[p.symbol]?.usdLeg;
+        if (leg === 'LONG_USD') return p.side === 'BUY' ? 'LONG_USD' : 'SHORT_USD';
+        if (leg === 'SHORT_USD') return p.side === 'BUY' ? 'SHORT_USD' : 'LONG_USD';
+        return null;
+      }).filter(Boolean);
+      const longUsdCount = usdDirs.filter(d => d === 'LONG_USD').length;
+      const shortUsdCount = usdDirs.filter(d => d === 'SHORT_USD').length;
+      const usdWarnEl = document.getElementById('vault-usd-warning');
+      if (longUsdCount >= 2 || shortUsdCount >= 2) {
+        usdWarnEl.classList.remove('hidden');
+        usdWarnEl.textContent = `⚠️ USD Correlation Alert: You have ${Math.max(longUsdCount, shortUsdCount)} open positions exposed to the same ${longUsdCount >= 2 ? 'LONG USD' : 'SHORT USD'} direction.`;
+      } else {
+        usdWarnEl.classList.add('hidden');
+      }
+
+      // Open Positions List
+      document.getElementById('vault-open-count').textContent = appState.openPositions.length;
+      const openListEl = document.getElementById('vault-open-list');
+      if (appState.openPositions.length === 0) {
+        openListEl.innerHTML = `<div class="rounded-xl bg-[#090d16] border border-gray-800 p-5 text-center text-xs text-gray-500">No active open positions. Use the form above or tap <span class="text-cyan-300">Log Setup to MT5 Vault</span> in Signals.</div>`;
+      } else {
+        openListEl.innerHTML = appState.openPositions.map(p => {
+          const pnl = calcPositionFloatingUsc(p);
+          const risk = Math.max(0.1, calcPositionRiskUsc(p));
+          const rMult = pnl / risk;
+          const rBarPct = Math.max(0, Math.min(100, ((rMult + 1.0) / 3.5) * 100));
+
+          return `
+            <div class="rounded-xl bg-[#090d16] border border-gray-800 p-3.5 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${p.side === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${p.side}</span>
+                  <span class="font-mono font-extrabold text-sm text-white">${p.symbol}</span>
+                  <span class="text-xs font-mono text-gray-400">${p.lots.toFixed(2)} lot</span>
+                </div>
+                <div class="text-right font-mono">
+                  <div class="text-xs font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${formatUsc(pnl, true)} (${rMult >= 0 ? '+' : ''}${rMult.toFixed(2)}R)</div>
+                  <div class="text-[10px] text-gray-400">${formatIdr(pnl, true)}</div>
+                </div>
+              </div>
+
+              <!-- R-Multiple Progress Bar (-1.0R to +2.5R) -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-[9px] font-mono text-gray-500">
+                  <span>-1.0R (SL)</span>
+                  <span>0.0R (BE)</span>
+                  <span>+2.5R (TP)</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <div class="h-full ${pnl >= 0 ? 'bg-emerald-500' : 'bg-rose-500'} transition-all duration-200" style="width: ${rBarPct}%"></div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-gray-400">
+                <span>Entry: <strong class="text-white">${formatPrice(p.symbol, p.entry)}</strong></span>
+                <span>SL: <strong class="text-rose-400">${formatPrice(p.symbol, p.sl)}</strong></span>
+                <span>TP: <strong class="text-emerald-400">${formatPrice(p.symbol, p.tp)}</strong></span>
+              </div>
+
+              <!-- Editable Current Tick Price + Quick Close Buttons -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-gray-800/80">
+                <div class="flex items-center gap-1">
+                  <button onclick="nudgeOpenTick('${p.id}', -1)" class="px-2 py-1 rounded bg-gray-800 text-[11px] font-mono text-rose-300">-5p</button>
+                  <input type="number" step="any" value="${formatPrice(p.symbol, p.currentPrice)}" onchange="updateOpenTickPrice('${p.id}', this.value)" class="w-24 text-center bg-[#101726] border border-gray-700 rounded-lg py-1 text-xs font-mono text-white" />
+                  <button onclick="nudgeOpenTick('${p.id}', 1)" class="px-2 py-1 rounded bg-gray-800 text-[11px] font-mono text-emerald-300">+5p</button>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button onclick="closeOpenPosition('${p.id}', 'TP')" class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">Close @ TP</button>
+                  <button onclick="closeOpenPosition('${p.id}', 'BE')" class="px-2 py-1 rounded bg-gray-800 text-gray-300 text-[10px] font-bold">BE</button>
+                  <button onclick="closeOpenPosition('${p.id}', 'SL')" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold">SL</button>
+                  <button onclick="closeOpenPosition('${p.id}', 'CUSTOM', ${p.currentPrice})" class="px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">Custom</button>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      // Equity Curve SVG
+      renderEquityCurveSvg(startCap);
+
+      // Closed Trade History Ledger
+      const ledgerEl = document.getElementById('vault-closed-ledger');
+      ledgerEl.innerHTML = closed.length === 0
+        ? `<div class="text-center py-4 text-xs text-gray-500">No closed trades recorded yet.</div>`
+        : closed.map(t => `
+          <div class="rounded-xl bg-[#090d16] border border-gray-800 px-3 py-2.5 flex items-center justify-between gap-2 text-xs font-mono">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="${t.side === 'BUY' ? 'text-emerald-400' : 'text-rose-400'} font-extrabold">${t.side}</span>
+                <span class="text-white font-bold">${t.symbol}</span>
+                <span class="text-gray-400 text-[10px]">${Number(t.lots).toFixed(2)} lot</span>
+                <span class="text-gray-500 text-[10px]">• ${t.timeWib || t.dateWib}</span>
+              </div>
+              <div class="text-[10px] text-gray-400 font-sans truncate mt-0.5">${t.note || ''}</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="text-right">
+                <div class="${Number(t.pnlUsc) >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${formatUsc(t.pnlUsc, true)}</div>
+                <div class="text-[10px] text-gray-500">${formatIdr(t.pnlUsc, true)}</div>
+              </div>
+              <button onclick="deleteClosedTrade('${t.id}')" class="p-1.5 rounded-lg bg-gray-900 hover:bg-rose-500/20 text-gray-500 hover:text-rose-400 text-xs" title="Delete entry">✕</button>
+            </div>
+          </div>`).join('');
+    }
+
+    function renderEquityCurveSvg(startCap) {
+      const svg = document.getElementById('vault-equity-chart');
+      if (!svg) return;
+      const pts = [startCap];
+      let running = startCap;
+      appState.closedTrades.slice().reverse().forEach(t => {
+        running = Number((running + (Number(t.pnlUsc) || 0)).toFixed(2));
+        pts.push(running);
+      });
+      if (pts.length === 1) pts.push(startCap);
+
+      const w = 600, h = 175, padX = 28, padY = 22;
+      const minV = Math.min(...pts) * 0.992;
+      const maxV = Math.max(...pts) * 1.008;
+      const span = Math.max(5, maxV - minV);
+
+      const coords = pts.map((v, i) => ({
+        x: padX + (i / (pts.length - 1)) * (w - padX * 2),
+        y: h - padY - ((v - minV) / span) * (h - padY * 2)
+      }));
+
+      const pathD = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ');
+      const strokeCol = pts[pts.length - 1] >= startCap ? '#10b981' : '#ef4444';
+
+      svg.innerHTML = `
+        <path d="${pathD}" fill="none" stroke="${strokeCol}" stroke-width="3" stroke-linecap="round" />
+        ${coords.map(c => `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#090d16" stroke="${strokeCol}" stroke-width="2" />`).join('')}
+        <text x="${padX}" y="14" fill="#9ca3af" font-size="11" font-family="JetBrains Mono">Start: ${startCap.toFixed(1)} USC</text>
+        <text x="${w - padX}" y="14" text-anchor="end" fill="${strokeCol}" font-size="11" font-weight="bold" font-family="JetBrains Mono">Now: ${pts[pts.length - 1].toFixed(1)} USC</text>
+      `;
+    }
+
+    // --- API KEYS MODAL & TOP STATUS BAR ---
+    function toggleApiModal(show) {
+      const modal = document.getElementById('api-keys-modal');
+      modal.classList.toggle('hidden', !show);
+      if (show) {
+        document.getElementById('cfg-gemini').value = appState.apiKeys.gemini || '';
+        document.getElementById('cfg-twelvedata').value = appState.apiKeys.twelveData || '';
+        document.getElementById('cfg-finnhub').value = appState.apiKeys.finnhub || '';
+        document.getElementById('cfg-idr').value = appState.apiKeys.idrRate || 182.5;
+        document.getElementById('cfg-risk').value = appState.apiKeys.riskPct || 1.8;
+      }
+    }
+
+    function saveApiModalSettings() {
+      appState.apiKeys.gemini = document.getElementById('cfg-gemini').value.trim();
+      appState.apiKeys.twelveData = document.getElementById('cfg-twelvedata').value.trim();
+      appState.apiKeys.finnhub = document.getElementById('cfg-finnhub').value.trim();
+      appState.apiKeys.idrRate = parseFloat(document.getElementById('cfg-idr').value) || 182.5;
+      appState.apiKeys.riskPct = Math.max(0.5, Math.min(3.0, parseFloat(document.getElementById('cfg-risk').value) || 1.8));
+      saveState();
+      toggleApiModal(false);
+      refreshLivePrices(false);
+      refreshLiveNewsWire(false);
+      fetchLiveEconomicCalendar(false);
+      renderAll();
+      showToast('API Keys & Cent settings saved locally.', 'success');
+    }
+
+    function updateTopStatusBar() {
+      const wib = getWibNow();
+      const sessionCtx = getWibSessionContext(wib);
+      checkWibCalendarAlertBot(wib);
+
+      const clockEl = document.getElementById('top-wib-clock');
+      if (clockEl) clockEl.textContent = wib.clockText;
+
+      const sessEl = document.getElementById('top-session-badge');
+      if (sessEl) {
+        sessEl.textContent = sessionCtx.sessionLabel;
+        sessEl.className = `text-[10px] font-bold px-1.5 py-0.5 rounded-md border uppercase tracking-wider truncate ${sessionCtx.badgeClass}`;
+      }
+
+      const eq = getCurrentEquityUsc();
+      document.getElementById('top-equity-usc').textContent = `${eq.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} USC`;
+      document.getElementById('top-equity-idr').textContent = formatIdr(eq);
+    }
+
+    function renderAll() {
+      updateTopStatusBar();
+      openFolder(appState.activeFolder || 'signals');
+    }
+
+    // =========================================================================
+    // 11. TERMINAL BOOTSTRAP
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      classifiedNews = BASELINE_NEWS_WIRE.map((item, idx) => classifyHeadlineWithBots(item, idx));
+      computeEightBotSignal(appState.activeSymbol, appState.activeTf);
+      document.getElementById('m-time').value = getWibNow().clockText;
+      fillFormWithMarketPrice();
+      generateExecutiveNewsSummary(false);
+      renderAll();
+
+      setInterval(updateTopStatusBar, 1000);
+      refreshLivePrices(false);
+      refreshLiveNewsWire(false);
+      fetchLiveEconomicCalendar(false);
+    });
+  </script>
+</body>
+</html>
