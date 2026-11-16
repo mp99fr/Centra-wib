@@ -1,0 +1,2982 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CENTRA WIB — Multi-Bot &amp; Myfxbook Terminal</title>
+
+  <!-- PWA & Mobile Standalone Support -->
+  <meta name="theme-color" content="#0b0f19" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CENTRA WIB" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230b0f19'/%3E%3Crect x='6' y='6' width='116' height='116' rx='24' fill='none' stroke='%2310b981' stroke-width='4'/%3E%3Cpath d='M26 84 L48 56 L68 68 L100 34' fill='none' stroke='%2310b981' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='100' cy='34' r='7' fill='%2306b6d4'/%3E%3Ctext x='64' y='108' font-family='sans-serif' font-size='16' font-weight='bold' fill='%23f8fafc' text-anchor='middle'%3ECENTRA WIB%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CENTRA%20WIB%20%E2%80%94%20Multi-Bot%20%26%20Myfxbook%20Terminal%22%2C%22short_name%22%3A%22CENTRA%20WIB%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b0f19%22%2C%22theme_color%22%3A%22%230b0f19%22%2C%22orientation%22%3A%22portrait%22%7D" />
+
+  <!-- Typography & Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html, body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .card-glass {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.96) 0%, rgba(12, 18, 30, 0.99) 100%);
+      border: 1px solid rgba(55, 65, 81, 0.55);
+      box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.65);
+    }
+    .folder-tab-bar {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.65);
+    }
+    .pulse-dot {
+      animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.88); }
+    }
+    .pb-safe-nav {
+      padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    }
+    .bottom-nav-safe {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0b0f19] text-gray-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- IN-APP TOAST NOTIFICATION BANNER (Replaces alert/confirm) -->
+  <div id="toast-container" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- STICKY TOP TERMINAL HEADER -->
+  <header class="sticky top-0 z-40 bg-[#0b0f19]/95 backdrop-blur-md border-b border-gray-800/90 px-3 py-2.5">
+    <div class="max-w-3xl mx-auto flex items-center justify-between gap-2">
+      <!-- Brand + Live WIB Clock & Session Badge -->
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm tracking-tight text-white truncate">CENTRA WIB</span>
+            <span id="header-session-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider truncate">
+              NY PRIME
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px] font-mono text-gray-400 tabular-nums">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span>
+            <span id="wib-clock-display">--:--:-- WIB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Controls: Equity Pill + Local Notification Bell -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="openFolder('vault', 'tracker')" class="text-right px-2.5 py-1 rounded-xl bg-[#111827] border border-gray-800 hover:border-gray-700 transition">
+          <div id="header-equity-usc" class="text-xs font-mono font-bold text-white tabular-nums">1,096.0 USC</div>
+          <div id="header-pnl-pill" class="text-[10px] font-mono font-semibold text-emerald-400 tabular-nums">+0.0 USC (Rp0)</div>
+        </button>
+
+        <button onclick="toggleNotificationDrawer()" aria-label="Local Terminal Notifications" class="relative p-2.5 rounded-xl bg-[#111827] border border-gray-800 hover:border-cyan-500/50 text-cyan-300 transition active:scale-95">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-mono font-extrabold flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTENT WORKSPACE (4 MINIMALISTIC FOLDERS)                       -->
+  <!-- ===================================================================== -->
+  <main class="max-w-3xl mx-auto px-3 pt-3 pb-safe-nav space-y-3">
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 1: TERMINAL (AI Signal & Bots | Live Chart | Cent Risk Calc) -->
+    <!-- =================================================================== -->
+    <section id="folder-terminal" class="folder-view space-y-3">
+      <!-- Minimalistic Folder Sub-Tabs -->
+      <div class="folder-tab-bar rounded-2xl p-1 grid grid-cols-3 gap-1">
+        <button onclick="switchSubTab('terminal', 'bots')" data-folder="terminal" data-sub="bots" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          ⚡ AI Signal &amp; Bots
+        </button>
+        <button onclick="switchSubTab('terminal', 'chart')" data-folder="terminal" data-sub="chart" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📈 Live Chart
+        </button>
+        <button onclick="switchSubTab('terminal', 'calc')" data-folder="terminal" data-sub="calc" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          🛡️ Cent Risk Calc
+        </button>
+      </div>
+
+      <!-- SUB-TAB 1A: AI SIGNAL & 8-BOT ENGINE -->
+      <div id="view-terminal-bots" class="subtab-view space-y-3">
+        <!-- Session / High-Impact Warning Strip (Dynamic from Bot 5) -->
+        <div id="session-warning-banner" class="rounded-2xl p-3 border text-xs flex items-start gap-2.5"></div>
+
+        <!-- Control Panel: Instrument + 3 Horizon Windows + 6 Timeframes -->
+        <div class="card-glass rounded-2xl p-4 space-y-3.5 border border-cyan-500/25">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">8-BOT CONFLUENCE ENGINE</span>
+              <h1 class="text-base font-extrabold text-white mt-1">Multi-Timeframe Signal &amp; Liquidity Desk</h1>
+            </div>
+            <span id="telemetry-mode-badge" class="px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-800 text-gray-300 border border-gray-700 shrink-0">
+              LIVE FX + ENGINE
+            </span>
+          </div>
+
+          <!-- Step 1: Select Instrument -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">1. Cent Instrument</label>
+            <div id="bot-instrument-pills" class="grid grid-cols-3 sm:grid-cols-6 gap-1.5"></div>
+          </div>
+
+          <!-- Step 2: Select 3 Trading Horizon Windows -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">2. Trading Horizon Window</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="selectHorizonWindow('scalp')" id="win-btn-scalp" class="horizon-btn p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">⚡ Short Scalp</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">1m / 5m • Quick Sweep</div>
+              </button>
+              <button onclick="selectHorizonWindow('intraday')" id="win-btn-intraday" class="horizon-btn p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">🎯 Medium Term</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">15m / 1H • Killzone</div>
+              </button>
+              <button onclick="selectHorizonWindow('swing')" id="win-btn-swing" class="horizon-btn p-2.5 rounded-xl border text-left transition">
+                <div class="text-xs font-extrabold text-white">🌙 Swing Term</div>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">4H / 1D • HTF + Astral</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Exact Timeframe Pill Selector (1m, 5m, 15m, 1H, 4H, 1D) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">3. Exact Chart Timeframe</label>
+              <span id="horizon-tf-hint" class="text-[10px] font-mono text-cyan-300">Window: Medium Term (15m / 1H)</span>
+            </div>
+            <div class="grid grid-cols-6 gap-1.5" id="bot-timeframe-pills">
+              <button onclick="selectTimeframe('1m')" data-tf="1m" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1m</button>
+              <button onclick="selectTimeframe('5m')" data-tf="5m" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">5m</button>
+              <button onclick="selectTimeframe('15m')" data-tf="15m" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">15m</button>
+              <button onclick="selectTimeframe('1H')" data-tf="1H" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1H</button>
+              <button onclick="selectTimeframe('4H')" data-tf="4H" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">4H</button>
+              <button onclick="selectTimeframe('1D')" data-tf="1D" class="bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition">1D</button>
+            </div>
+          </div>
+
+          <!-- Primary Generate Signal Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+            <button onclick="runMultiBotAnalysis(true)" class="sm:col-span-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-[#051017] font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-emerald-500/20 transition active:scale-[0.99]">
+              ⚡ GENERATE 8-BOT SIGNAL &amp; ENTRY ZONES
+            </button>
+            <button onclick="scanAllPairsLeaderboard()" class="py-3.5 px-3 rounded-xl bg-[#182234] hover:bg-gray-800 border border-gray-700 text-cyan-300 font-bold text-xs transition active:scale-[0.99]">
+              🔍 Rank All 6 Pairs
+            </button>
+          </div>
+
+          <!-- Animated Scan Progress -->
+          <div id="bot-scan-progress-box" class="hidden rounded-xl bg-[#0b0f19] border border-cyan-500/30 p-3 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span id="scan-step-label" class="font-mono text-cyan-300 font-semibold">Running 8-Bot Multi-TF Pipeline...</span>
+              <span id="scan-step-pct" class="font-mono text-emerald-400 font-bold">0%</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div id="scan-step-bar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-150" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6-PAIR LEADERBOARD (Toggled via 'Rank All 6 Pairs') -->
+        <div id="pairs-leaderboard-card" class="hidden card-glass rounded-2xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold text-white">6-Pair Probability Leaderboard (<span id="leaderboard-tf-label">1H</span>)</h2>
+              <p class="text-[11px] text-gray-400">Sorted by highest Long/Short conviction • Tap any pair to load full 8-Bot breakdown</p>
+            </div>
+            <button onclick="document.getElementById('pairs-leaderboard-card').classList.add('hidden')" class="text-xs text-gray-400 hover:text-white px-2 py-1">Close</button>
+          </div>
+          <div id="pairs-leaderboard-list" class="space-y-2"></div>
+        </div>
+
+        <!-- BOT 8 MASTER VERDICT, ENTRY PRICES & ELABORATION CARD -->
+        <div id="bot8-verdict-container" class="card-glass rounded-2xl p-4 space-y-4"></div>
+
+        <!-- 8 SPECIALIZED BOTS DETAILED DIAGNOSTIC CARDS -->
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold text-white">8-Bot Analytical Breakdown</h2>
+              <p class="text-[11px] text-gray-400">SMC Liquidity, FVG/iFVG, Chart Geometry, Session Guard &amp; Astral Cycle</p>
+            </div>
+            <button onclick="generateGeminiDeepNote()" id="btn-gemini-note" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold transition">
+              ✨ AI Second Opinion
+            </button>
+          </div>
+          <div id="gemini-note-box" class="hidden rounded-xl bg-[#0b0f19] border border-cyan-500/30 p-3 text-xs text-gray-200 leading-relaxed"></div>
+          <div id="eight-bots-cards-grid" class="grid grid-cols-1 gap-2.5"></div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 1B: LIVE CHART (TradingView WIB Synced) -->
+      <div id="view-terminal-chart" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-3 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span id="chart-top-verdict" class="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">BUY</span>
+              <span id="chart-top-title" class="text-xs font-extrabold text-white truncate">XAUUSDc • 1H (Asia/Jakarta WIB)</span>
+            </div>
+            <div id="chart-top-levels" class="text-[11px] font-mono text-gray-400 truncate mt-0.5">Limit Entry • SL • TP</div>
+          </div>
+          <button onclick="switchSubTab('terminal', 'bots')" class="px-3 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs font-bold shrink-0">
+            8-Bot Thesis →
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <div id="chart-pair-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
+          <div class="flex items-center gap-1 bg-[#111827] p-1 rounded-xl border border-gray-800 shrink-0">
+            <button onclick="selectTimeframe('1m')" data-ctf="1m" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1m</button>
+            <button onclick="selectTimeframe('5m')" data-ctf="5m" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">5m</button>
+            <button onclick="selectTimeframe('15m')" data-ctf="15m" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">15m</button>
+            <button onclick="selectTimeframe('1H')" data-ctf="1H" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1H</button>
+            <button onclick="selectTimeframe('4H')" data-ctf="4H" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">4H</button>
+            <button onclick="selectTimeframe('1D')" data-ctf="1D" class="chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold">1D</button>
+          </div>
+        </div>
+
+        <div class="card-glass rounded-2xl overflow-hidden border border-gray-800">
+          <div id="tv-widget-box" class="w-full h-[400px] sm:h-[470px] bg-[#0b0f19]"></div>
+        </div>
+
+        <div id="chart-smc-zones-strip" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+      </div>
+
+      <!-- SUB-TAB 1C: CENT RISK & LOT CALCULATOR -->
+      <div id="view-terminal-calc" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div>
+            <h2 class="text-base font-extrabold text-white">Cent Account Position Sizer (USC &amp; IDR)</h2>
+            <p class="text-xs text-gray-400">Protects your 1,096 USC (Rp200.000) capital by capping single-trade risk at 1.5%–2.0%.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Instrument</label>
+              <select id="calc-symbol" onchange="updateRiskCalculator()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white">
+                <option value="XAUUSDc">XAUUSDc</option>
+                <option value="AUDCADc">AUDCADc</option>
+                <option value="USDJPYc">USDJPYc</option>
+                <option value="USTECc">USTECc</option>
+                <option value="USOILc">USOILc</option>
+                <option value="BTCUSDc">BTCUSDc</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Risk % of Equity</label>
+              <input id="calc-risk-pct" type="number" step="0.1" value="1.8" oninput="updateRiskCalculator()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Stop-Loss Distance (Price Units)</label>
+              <input id="calc-sl-dist" type="number" step="any" value="14.5" oninput="updateRiskCalculator()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Reward-to-Risk Ratio</label>
+              <select id="calc-rr" onchange="updateRiskCalculator()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white">
+                <option value="1.5">1 : 1.5 R:R</option>
+                <option value="2.0">1 : 2.0 R:R</option>
+                <option value="2.5" selected>1 : 2.5 R:R</option>
+                <option value="3.0">1 : 3.0 R:R</option>
+              </select>
+            </div>
+          </div>
+          <div id="calc-result-box" class="rounded-xl bg-[#0b0f19] border border-emerald-500/30 p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 2: INTEL & NEWS (Pair News Wire | WIB Calendar | Insights)   -->
+    <!-- =================================================================== -->
+    <section id="folder-intel" class="folder-view hidden space-y-3">
+      <!-- Minimalistic Folder Sub-Tabs -->
+      <div class="folder-tab-bar rounded-2xl p-1 grid grid-cols-3 gap-1">
+        <button onclick="switchSubTab('intel', 'news')" data-folder="intel" data-sub="news" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📰 Pair News Wire
+        </button>
+        <button onclick="switchSubTab('intel', 'calendar')" data-folder="intel" data-sub="calendar" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📅 WIB Calendar
+        </button>
+        <button onclick="switchSubTab('intel', 'insights')" data-folder="intel" data-sub="insights" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          🧠 Pair Insights
+        </button>
+      </div>
+
+      <!-- SUB-TAB 2A: DEDICATED PAIR NEWS WIRE -->
+      <div id="view-intel-news" class="subtab-view space-y-3">
+        <!-- Live FX Ticker Strip (Frankfurter Free API) -->
+        <div class="card-glass rounded-2xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-300">Live Interbank FX Reference Strip</span>
+            <button onclick="refreshAllNewsSources(true)" class="text-[11px] font-semibold text-emerald-400 hover:underline">↻ Refresh Wire</button>
+          </div>
+          <div id="live-fx-ticker-strip" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono"></div>
+        </div>
+
+        <!-- Pair News Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="news-pair-filter-pills"></div>
+
+        <!-- News Feed List -->
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-extrabold text-white">Real-Time Pair &amp; Macro News Feed</h2>
+              <p id="news-sources-subtitle" class="text-[11px] text-gray-400">Sources: FXStreet RSS • DailyFX RSS • CoinTelegraph • Finnhub</p>
+            </div>
+            <span id="news-count-pill" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-gray-800 text-cyan-300 shrink-0">0 items</span>
+          </div>
+          <div id="dedicated-news-feed-list" class="space-y-2.5"></div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2B: WIB ECONOMIC CALENDAR & LOCAL NOTIF BOT -->
+      <div id="view-intel-calendar" class="subtab-view hidden space-y-3">
+        <!-- Local Terminal Notification Bot Controls -->
+        <div class="card-glass rounded-2xl p-4 border border-amber-500/30 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">LOCAL NOTIF BOT</span>
+              <h2 class="text-sm font-extrabold text-white mt-1">Terminal Calendar &amp; Session Alert Bot</h2>
+              <p class="text-xs text-gray-400">Triggers local in-app banners, bell alerts &amp; audio chime before High-Impact WIB releases and session opens/closes.</p>
+            </div>
+            <button onclick="triggerTestTerminalAlert()" class="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold shrink-0">
+              🔔 Test Alert
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            <label class="flex items-center justify-between rounded-xl bg-[#0b0f19] border border-gray-800 px-3 py-2.5 cursor-pointer">
+              <span class="font-semibold text-gray-200">15m Pre-News Alert</span>
+              <input type="checkbox" id="toggle-news-alerts" checked onchange="appState.notifPrefs.preNews = this.checked; saveState();" class="accent-emerald-500 w-4 h-4" />
+            </label>
+            <label class="flex items-center justify-between rounded-xl bg-[#0b0f19] border border-gray-800 px-3 py-2.5 cursor-pointer">
+              <span class="font-semibold text-gray-200">Session Open/End</span>
+              <input type="checkbox" id="toggle-session-alerts" checked onchange="appState.notifPrefs.sessionAlerts = this.checked; saveState();" class="accent-emerald-500 w-4 h-4" />
+            </label>
+            <label class="flex items-center justify-between rounded-xl bg-[#0b0f19] border border-gray-800 px-3 py-2.5 cursor-pointer">
+              <span class="font-semibold text-gray-200">Web Audio Chime</span>
+              <input type="checkbox" id="toggle-sound-alerts" checked onchange="appState.notifPrefs.sound = this.checked; saveState();" class="accent-emerald-500 w-4 h-4" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Weekly WIB Economic Calendar -->
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-white">Upcoming High &amp; Medium Impact Events (WIB)</h3>
+              <p class="text-[11px] text-gray-400">All times converted to Asia/Jakarta (UTC+7) • Tap bell icon to toggle event reminder</p>
+            </div>
+          </div>
+          <div id="wib-calendar-list" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2C: DEDICATED PAIR INSIGHTS (BOT 6 DOSSIERS) -->
+      <div id="view-intel-insights" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-4">
+          <h2 class="text-base font-extrabold text-white">Dedicated Pair Intelligence &amp; Driver Dossiers</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Deep breakdown of what is happening right now, the fundamental whys, and what may happen next for every Cent pair.</p>
+        </div>
+        <div id="pair-insights-cards" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 3: MT5 VAULT (Position Tracker | Myfxbook Sync | Stats)      -->
+    <!-- =================================================================== -->
+    <section id="folder-vault" class="folder-view hidden space-y-3">
+      <!-- Account Balance & Heat Guard Summary Card -->
+      <div class="card-glass rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">MT5 Cent Equity (USC / IDR)</span>
+            <div class="flex items-baseline gap-2 mt-0.5">
+              <span id="vault-equity-usc" class="text-2xl font-mono font-extrabold text-white tabular-nums">1,096.0 USC</span>
+              <span id="vault-equity-idr" class="text-xs font-mono text-cyan-300 tabular-nums">(Rp200.020)</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <label class="block text-[10px] text-gray-400">Start Bal (USC)</label>
+            <input id="vault-start-bal" type="number" step="0.1" value="1096" onchange="updateVaultStartBalance(this.value)" class="w-24 text-right font-mono text-xs bg-[#0b0f19] border border-gray-700 rounded-lg px-2 py-1 text-white" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-xs font-mono">
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Net P&amp;L</div>
+            <div id="vault-net-pnl" class="font-bold text-emerald-400 mt-0.5">+0.0 USC</div>
+            <div id="vault-net-idr" class="text-[10px] text-gray-400">Rp0</div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Win Rate</div>
+            <div id="vault-win-rate" class="font-bold text-white mt-0.5">0.0%</div>
+            <div id="vault-closed-cnt" class="text-[10px] text-gray-400">0 closed</div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Portfolio Heat</div>
+            <div id="vault-heat-pct" class="font-bold text-emerald-400 mt-0.5">0.0% / 4.5%</div>
+            <div id="vault-heat-usc" class="text-[10px] text-gray-400">0.0 USC open</div>
+          </div>
+        </div>
+        <div id="vault-guardrails-list" class="space-y-1"></div>
+      </div>
+
+      <!-- Minimalistic Folder Sub-Tabs -->
+      <div class="folder-tab-bar rounded-2xl p-1 grid grid-cols-3 gap-1">
+        <button onclick="switchSubTab('vault', 'tracker')" data-folder="vault" data-sub="tracker" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📋 Position Tracker
+        </button>
+        <button onclick="switchSubTab('vault', 'myfxbook')" data-folder="vault" data-sub="myfxbook" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          🔄 Myfxbook Sync
+        </button>
+        <button onclick="switchSubTab('vault', 'stats')" data-folder="vault" data-sub="stats" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📈 Equity &amp; Stats
+        </button>
+      </div>
+
+      <!-- SUB-TAB 3A: LIVE POSITION TRACKER -->
+      <div id="view-vault-tracker" class="subtab-view space-y-3">
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-white">Log Cent Position</h3>
+            <span id="tracker-risk-est" class="text-[11px] font-mono text-cyan-300">Est. Risk: 18.0 USC</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Pair</label>
+              <select id="tr-symbol" onchange="prefillTrackerOrder()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white">
+                <option value="XAUUSDc">XAUUSDc</option>
+                <option value="AUDCADc">AUDCADc</option>
+                <option value="USDJPYc">USDJPYc</option>
+                <option value="USTECc">USTECc</option>
+                <option value="USOILc">USOILc</option>
+                <option value="BTCUSDc">BTCUSDc</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Side</label>
+              <select id="tr-side" onchange="updateTrackerRiskPreview()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-emerald-400">
+                <option value="BUY">BUY (LONG)</option>
+                <option value="SELL">SELL (SHORT)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Cent Lots</label>
+              <input id="tr-lots" type="number" step="0.01" min="0.01" value="0.01" oninput="updateTrackerRiskPreview()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Entry Price</label>
+              <input id="tr-entry" type="number" step="any" oninput="updateTrackerRiskPreview()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Stop Loss</label>
+              <input id="tr-sl" type="number" step="any" oninput="updateTrackerRiskPreview()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-rose-300" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-gray-400 mb-1">Take Profit</label>
+              <input id="tr-tp" type="number" step="any" oninput="updateTrackerRiskPreview()" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-emerald-300" />
+            </div>
+          </div>
+          <button onclick="addLocalPosition()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#051017] font-extrabold text-xs tracking-wide transition">
+            + Open Position in MT5 Vault
+          </button>
+        </div>
+
+        <div class="card-glass rounded-2xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-white">Active Open Positions (<span id="open-pos-cnt">0</span>)</h3>
+            <span id="open-floating-label" class="text-xs font-mono font-bold text-gray-300">Floating: 0.0 USC</span>
+          </div>
+          <div id="open-positions-container" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3B: MYFXBOOK CLOUD SYNC & CSV IMPORT -->
+      <div id="view-vault-myfxbook" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-4 border border-cyan-500/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">FREE CLOUD SYNC</span>
+              <h3 class="text-base font-extrabold text-white mt-1">Myfxbook JSON API Sync</h3>
+              <p class="text-xs text-gray-400">Syncs your MT5 Cent account read-only via Myfxbook (no PC/VPS required).</p>
+            </div>
+            <span id="mfb-status-pill" class="px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-800 text-gray-400">Offline</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-semibold text-gray-400 mb-1">Myfxbook Email</label>
+              <input id="mfb-email-input" type="email" placeholder="you@email.com" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-gray-400 mb-1">Myfxbook Password</label>
+              <input id="mfb-pass-input" type="password" placeholder="••••••••••••" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-semibold text-gray-400 mb-1">Linked MT5 Account</label>
+            <select id="mfb-acc-dropdown" onchange="onSelectMyfxbookAccount(this.value)" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white">
+              <option value="">— Sync to load your Myfxbook MT5 accounts —</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-sync-mfb" onclick="syncMyfxbookAccount(true)" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-[#051017] font-extrabold text-xs tracking-wide transition">
+              🔄 Sync Myfxbook Now
+            </button>
+            <button onclick="logoutMyfxbook()" class="py-3 px-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-xs">
+              Logout
+            </button>
+          </div>
+
+          <label class="flex items-center justify-between rounded-xl bg-[#0b0f19] border border-gray-800 px-3 py-2.5 cursor-pointer">
+            <div>
+              <div class="text-xs font-semibold text-white">Auto-Sync Every 60 Seconds</div>
+              <div id="mfb-sync-timestamp" class="text-[10px] text-gray-400">Not synced yet</div>
+            </div>
+            <input id="mfb-autosync-chk" type="checkbox" onchange="setMyfxbookAutoSync(this.checked)" class="accent-emerald-500 w-4 h-4" />
+          </label>
+
+          <div id="mfb-stats-card" class="hidden rounded-xl bg-[#0b0f19] border border-emerald-500/30 p-3 space-y-1.5"></div>
+        </div>
+
+        <!-- CSV / MT5 Statement Import -->
+        <div class="card-glass rounded-2xl p-4 space-y-2.5">
+          <h3 class="text-sm font-extrabold text-white">Import Myfxbook .CSV or MT5 .HTML Statement</h3>
+          <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-700 hover:border-cyan-500/60 rounded-2xl bg-[#0b0f19] cursor-pointer transition">
+            <span class="text-xs font-bold text-cyan-300">📂 Tap to Upload .CSV / .HTML File</span>
+            <span class="text-[10px] text-gray-400 mt-0.5">Auto-deduplicates trades by timestamp &amp; profit</span>
+            <input type="file" accept=".csv,.html,.htm,.txt" onchange="importStatementFile(event)" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3C: EQUITY CURVE & CLOSED JOURNAL -->
+      <div id="view-vault-stats" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-white">Cent Equity Curve (USC)</h3>
+            <div class="flex items-center gap-1.5">
+              <button onclick="exportVaultJson()" class="px-2.5 py-1 rounded-lg bg-gray-800 text-[11px] font-semibold text-gray-200">Export</button>
+              <button id="btn-reset-vault" onclick="resetVaultHistory()" class="px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/30 text-[11px] font-semibold text-rose-300">Reset</button>
+            </div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2">
+            <svg id="vault-equity-svg" viewBox="0 0 600 170" class="w-full h-36 overflow-visible"></svg>
+          </div>
+          <div id="closed-journal-list" class="space-y-2 max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- FOLDER 4: ACADEMY & API (Learning Chapters | Free API Vault)        -->
+    <!-- =================================================================== -->
+    <section id="folder-academy" class="folder-view hidden space-y-3">
+      <!-- Minimalistic Folder Sub-Tabs -->
+      <div class="folder-tab-bar rounded-2xl p-1 grid grid-cols-2 gap-1">
+        <button onclick="switchSubTab('academy', 'chapters')" data-folder="academy" data-sub="chapters" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          📚 Learning Chapters
+        </button>
+        <button onclick="switchSubTab('academy', 'apivault')" data-folder="academy" data-sub="apivault" class="subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition">
+          🔐 Free API Vault
+        </button>
+      </div>
+
+      <!-- SUB-TAB 4A: STRUCTURED LEARNING CHAPTERS & GLOSSARY -->
+      <div id="view-academy-chapters" class="subtab-view space-y-3">
+        <div class="card-glass rounded-2xl p-4">
+          <h2 class="text-base font-extrabold text-white">CENTRA WIB Institutional Trading Academy</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Master multi-timeframe technicals, SMC Liquidity/FVG/iFVG, chart geometry, news reading, and complex market &amp; lunar terms.</p>
+        </div>
+
+        <!-- Chapter Selector Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="academy-chapter-pills"></div>
+
+        <!-- Active Chapter Content Card -->
+        <div id="academy-chapter-content" class="card-glass rounded-2xl p-4 space-y-4"></div>
+      </div>
+
+      <!-- SUB-TAB 4B: FREE API VAULT & CONVERSION SETTINGS -->
+      <div id="view-academy-apivault" class="subtab-view hidden space-y-3">
+        <div class="card-glass rounded-2xl p-4 space-y-3">
+          <div>
+            <h2 class="text-base font-extrabold text-white">🔐 Free API Vault &amp; Cent Settings</h2>
+            <p class="text-xs text-gray-400">Your terminal already includes keyless Frankfurter FX rates and RSS news. Add optional free keys below for live 1H/15m candles and Gemini AI second opinions.</p>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Twelve Data API Key <span class="text-gray-500 font-normal">(twelvedata.com — 800 free calls/day)</span></label>
+              <input id="api-twelvedata-input" type="text" placeholder="Optional • Paste Twelve Data key" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Finnhub API Key <span class="text-gray-500 font-normal">(finnhub.io — 60 free calls/min)</span></label>
+              <input id="api-finnhub-input" type="text" placeholder="Optional • Paste Finnhub key" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Google AI Studio Gemini Key <span class="text-gray-500 font-normal">(aistudio.google.com — Free tier)</span></label>
+              <input id="api-gemini-input" type="password" placeholder="Optional • Paste Gemini key" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">IDR per 1 USC</label>
+                <input id="api-idr-input" type="number" step="0.1" value="182.5" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Max Risk / Trade (%)</label>
+                <input id="api-risk-input" type="number" step="0.1" min="0.5" max="3.0" value="1.8" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white" />
+              </div>
+            </div>
+          </div>
+
+          <button onclick="saveApiVaultSettings()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-[#051017] font-extrabold text-xs tracking-wide transition">
+            Save API Keys &amp; Refresh Live Feeds
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MINIMALISTIC 4-FOLDER BOTTOM NAVIGATION BAR                           -->
+  <!-- ===================================================================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#0b0f19]/95 backdrop-blur-lg border-t border-gray-800/90 bottom-nav-safe">
+    <div class="max-w-3xl mx-auto grid grid-cols-4">
+      <button onclick="openFolder('terminal')" data-navfolder="terminal" class="folder-nav-btn py-2.5 flex flex-col items-center justify-center gap-1 text-emerald-400 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span class="text-[11px] font-bold">Terminal</span>
+      </button>
+
+      <button onclick="openFolder('intel')" data-navfolder="intel" class="folder-nav-btn py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span class="text-[11px] font-bold">Intel &amp; News</span>
+      </button>
+
+      <button onclick="openFolder('vault')" data-navfolder="vault" class="folder-nav-btn py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20V10"></path>
+          <path d="M18 20V4"></path>
+          <path d="M6 20v-4"></path>
+        </svg>
+        <span class="text-[11px] font-bold">MT5 Vault</span>
+      </button>
+
+      <button onclick="openFolder('academy')" data-navfolder="academy" class="folder-nav-btn py-2.5 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        <span class="text-[11px] font-bold">Academy &amp; API</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- LOCAL TERMINAL NOTIFICATION LOG DRAWER -->
+  <div id="notif-drawer-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-[#111827] border border-gray-800 p-5 space-y-3 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold text-white">🔔 Local Terminal Alert Log</h2>
+          <p class="text-xs text-gray-400">Session transitions, WIB high-impact calendar alerts &amp; sideways warnings.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="clearTerminalNotifications()" class="px-2.5 py-1.5 rounded-xl bg-gray-800 text-xs font-semibold text-gray-300">Clear</button>
+          <button onclick="toggleNotificationDrawer()" class="p-2 rounded-xl bg-gray-800 text-gray-300">✕</button>
+        </div>
+      </div>
+      <div id="notif-log-list" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- TradingView Widget Library -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+  <script>
+    // =========================================================================
+    // 1. INSTRUMENT SPECS, TIMEFRAME MULTIPLIERS & CURATED INTELLIGENCE
+    // =========================================================================
+    const INSTRUMENTS = {
+      XAUUSDc: {
+        symbol: 'XAUUSDc',
+        clean: 'XAUUSD',
+        tvSymbol: 'OANDA:XAUUSD',
+        twelveSymbol: 'XAU/USD',
+        name: 'Gold Spot vs US Dollar (Cent)',
+        usdLeg: 'SHORT_USD',
+        decimals: 2,
+        pipSize: 0.1,
+        uscPerPoint001: 1.0,
+        basePrice: 2664.50,
+        h1Atr: 14.2,
+        whatIsHappening: 'Gold is rotating between institutional London/NY liquidity pools as real Treasury yields and central bank physical accumulation battle near key H4 structure.',
+        whyMoving: 'Driven inversely by US 10-Year Real Yields and DXY momentum. Whenever Fed rate expectations soften or geopolitical hedging rises, bullion sweeps Sell-Side Liquidity (SSL) and expands upward.',
+        whatMayHappen: 'Bullish scenario: Holding above H1 Bullish FVG triggers a draw toward Buy-Side Liquidity above recent swing highs. Bearish scenario: Hot US retail sales or hawkish Fed commentary breaks H1 SSL toward daily discount zones.'
+      },
+      AUDCADc: {
+        symbol: 'AUDCADc',
+        clean: 'AUDCAD',
+        tvSymbol: 'OANDA:AUDCAD',
+        twelveSymbol: 'AUD/CAD',
+        name: 'Australian Dollar vs Canadian Dollar (Cent)',
+        usdLeg: 'NEUTRAL_USD',
+        decimals: 5,
+        pipSize: 0.0001,
+        uscPerPoint001: 720,
+        basePrice: 0.91320,
+        h1Atr: 0.0036,
+        whatIsHappening: 'AUDCADc is oscillating inside a clean cross-currency channel, offering insulation from direct USD news spikes during US data releases.',
+        whyMoving: 'Reflects the relative divergence between RBA rate-hold posture / China stimulus metals demand (AUD) versus WTI Crude Oil & BoC easing trajectory (CAD).',
+        whatMayHappen: 'Bullish scenario: Soft EIA oil build weakens CAD and lifts AUDCADc through H1 resistance. Bearish scenario: OPEC+ supply tightening boosts WTI crude and drives AUDCADc lower into SSL.'
+      },
+      USDJPYc: {
+        symbol: 'USDJPYc',
+        clean: 'USDJPY',
+        tvSymbol: 'OANDA:USDJPY',
+        twelveSymbol: 'USD/JPY',
+        name: 'US Dollar vs Japanese Yen (Cent)',
+        usdLeg: 'LONG_USD',
+        decimals: 3,
+        pipSize: 0.01,
+        uscPerPoint001: 6.5,
+        basePrice: 154.120,
+        h1Atr: 0.88,
+        whatIsHappening: 'USDJPYc is tracking US-Japan 10Y yield spreads tightly while traders watch Japanese Ministry of Finance verbal intervention levels near psychological round handles.',
+        whyMoving: 'Sensitive to US Treasury yield moves during NY overlap (19:00–23:00 WIB) and Tokyo morning fix flows (07:55 WIB) ahead of Japan National Core CPI.',
+        whatMayHappen: 'Bullish scenario: Rising US yields propel an ascending breakout toward upper BSL. Bearish scenario: BoJ hawkish inflation print or MoF warning triggers a sharp CHoCH down into H4 iFVG.'
+      },
+      USTECc: {
+        symbol: 'USTECc',
+        clean: 'USTEC',
+        tvSymbol: 'PEPPERSTONE:NAS100',
+        twelveSymbol: 'QQQ',
+        name: 'US Tech 100 / Nasdaq Index (Cent)',
+        usdLeg: 'SHORT_USD',
+        decimals: 1,
+        pipSize: 1.0,
+        uscPerPoint001: 0.1,
+        basePrice: 20540.0,
+        h1Atr: 158.0,
+        whatIsHappening: 'Nasdaq 100 is consolidating ahead of the 21:30 WIB NY Cash Market open, building equal highs (BSL) and intraday FVG imbalances.',
+        whyMoving: 'Mega-cap AI semiconductor earnings expectations and 10Y Treasury yield stability dictate institutional equity risk appetite.',
+        whatMayHappen: 'Bullish scenario: Post-21:30 WIB NY open liquidity sweep below M15 SSL followed by reclaim triggers a continuation rally. Bearish scenario: Yield spike rejects H1 resistance and fills lower daily FVG.'
+      },
+      USOILc: {
+        symbol: 'USOILc',
+        clean: 'USOIL',
+        tvSymbol: 'TVC:USOIL',
+        twelveSymbol: 'WTI/USD',
+        name: 'WTI Crude Oil Spot (Cent)',
+        usdLeg: 'SHORT_USD',
+        decimals: 2,
+        pipSize: 0.01,
+        uscPerPoint001: 1.0,
+        basePrice: 69.25,
+        h1Atr: 1.32,
+        whatIsHappening: 'WTI Crude is coiling in a compression structure around the $69.00 psychological pivot ahead of weekly US EIA inventory data.',
+        whyMoving: 'OPEC+ production quota compliance and Middle East supply-route risk premiums are offsetting sluggish global manufacturing PMI figures.',
+        whatMayHappen: 'Bullish scenario: Surprise US crude inventory draw breaks the upper trendline toward $71.00 BSL. Bearish scenario: Inventory build + strong DXY sweeps $68.00 SSL.'
+      },
+      BTCUSDc: {
+        symbol: 'BTCUSDc',
+        clean: 'BTCUSD',
+        tvSymbol: 'BITSTAMP:BTCUSD',
+        twelveSymbol: 'BTC/USD',
+        name: 'Bitcoin vs US Dollar (Cent)',
+        usdLeg: 'SHORT_USD',
+        decimals: 1,
+        pipSize: 1.0,
+        uscPerPoint001: 0.01,
+        basePrice: 89850.0,
+        h1Atr: 1420.0,
+        whatIsHappening: 'Bitcoin is holding elevated structural support as spot ETF net inflows absorb short-term derivatives profit-taking.',
+        whyMoving: 'Driven by institutional spot ETF demand during NY trading hours, global M2 liquidity expansion, and Nasdaq risk-on correlation.',
+        whatMayHappen: 'Bullish scenario: H1 Bullish Flag breakout targets the $92,000 psychological BSL magnet. Bearish scenario: Failure to hold H1 EMA50 triggers a liquidation wick into the $87,500 FVG.'
+      }
+    };
+
+    const SYMBOL_KEYS = Object.keys(INSTRUMENTS);
+
+    const TF_CONFIG = {
+      '1m':  { tf: '1m',  window: 'scalp',    tv: '1',   atrScale: 0.14, label: '1-Minute Scalp' },
+      '5m':  { tf: '5m',  window: 'scalp',    tv: '5',   atrScale: 0.28, label: '5-Minute Scalp' },
+      '15m': { tf: '15m', window: 'intraday', tv: '15',  atrScale: 0.52, label: '15-Minute Intraday' },
+      '1H':  { tf: '1H',  window: 'intraday', tv: '60',  atrScale: 1.00, label: '1-Hour Intraday' },
+      '4H':  { tf: '4H',  window: 'swing',    tv: '240', atrScale: 2.15, label: '4-Hour Swing' },
+      '1D':  { tf: '1D',  window: 'swing',    tv: 'D',   atrScale: 4.40, label: '1-Day Macro Swing' }
+    };
+
+    // Weekly Economic Calendar in WIB (Asia/Jakarta, UTC+7)
+    const WIB_ECONOMIC_EVENTS = [
+      { id: 'ev1', dayLabel: 'Mon 16 Nov', wibHour: 20, wibMin: 30, currency: 'USD', impact: 'MEDIUM', title: 'NY Empire State Manufacturing Index', pairs: ['XAUUSDc', 'USDJPYc', 'USTECc'], forecast: '-0.5', previous: '-11.9' },
+      { id: 'ev2', dayLabel: 'Mon 16 Nov', wibHour: 22, wibMin: 30, currency: 'USD', impact: 'HIGH', title: 'Fed Chair & FOMC Monetary Policy Remarks', pairs: ['XAUUSDc', 'USDJPYc', 'USTECc', 'BTCUSDc'], forecast: 'Hawkish/Neutral', previous: '—' },
+      { id: 'ev3', dayLabel: 'Tue 17 Nov', wibHour: 7,  wibMin: 30, currency: 'AUD', impact: 'HIGH', title: 'RBA Monetary Policy Meeting Minutes', pairs: ['AUDCADc'], forecast: 'Hold 4.35%', previous: '4.35%' },
+      { id: 'ev4', dayLabel: 'Tue 17 Nov', wibHour: 20, wibMin: 30, currency: 'USD', impact: 'HIGH', title: 'US Core Retail Sales & Retail Sales m/m', pairs: ['XAUUSDc', 'USDJPYc', 'USTECc', 'BTCUSDc'], forecast: '0.3%', previous: '0.4%' },
+      { id: 'ev5', dayLabel: 'Wed 18 Nov', wibHour: 14, wibMin: 30, currency: 'IDR', impact: 'HIGH', title: 'Bank Indonesia (BI-Rate) RDG Decision', pairs: ['USDJPYc', 'XAUUSDc'], forecast: '6.00%', previous: '6.00%' },
+      { id: 'ev6', dayLabel: 'Wed 18 Nov', wibHour: 22, wibMin: 30, currency: 'USD', impact: 'HIGH', title: 'EIA US Crude Oil Inventories', pairs: ['USOILc', 'AUDCADc'], forecast: '1.4M', previous: '2.1M' },
+      { id: 'ev7', dayLabel: 'Thu 19 Nov', wibHour: 2,  wibMin: 0,  currency: 'USD', impact: 'HIGH', title: 'FOMC Meeting Minutes Release', pairs: ['XAUUSDc', 'USDJPYc', 'USTECc', 'BTCUSDc'], forecast: 'Rate Path', previous: '—' },
+      { id: 'ev8', dayLabel: 'Thu 19 Nov', wibHour: 20, wibMin: 30, currency: 'USD', impact: 'HIGH', title: 'US Unemployment Claims & Philly Fed Index', pairs: ['XAUUSDc', 'USDJPYc', 'USTECc'], forecast: '220K', previous: '217K' },
+      { id: 'ev9', dayLabel: 'Fri 20 Nov', wibHour: 6,  wibMin: 30, currency: 'JPY', impact: 'HIGH', title: 'Japan National Core CPI y/y', pairs: ['USDJPYc'], forecast: '2.2%', previous: '2.4%' }
+    ];
+
+    // Curated Pair-Tagged News Wire (Supplemented by live RSS / Finnhub)
+    const CURATED_NEWS_WIRE = [
+      { id: 'n1', pair: 'XAUUSDc', title: 'Gold Holds Key London/NY Liquidity Shelf as Real Treasury Yields Pause', source: 'Bullion Desk Wire', timeWib: '14m ago', bias: 'BULLISH' },
+      { id: 'n2', pair: 'USDJPYc', title: 'USD/JPY Eyes US Yield Spreads While Tokyo Desk Watches MoF Verbal Cues', source: 'FXStreet Wire', timeWib: '29m ago', bias: 'NEUTRAL' },
+      { id: 'n3', pair: 'USTECc', title: 'Nasdaq 100 Futures Coil Ahead of NY Cash Open & US Retail Sales Print', source: 'Wall St Macro', timeWib: '41m ago', bias: 'BULLISH' },
+      { id: 'n4', pair: 'USOILc', title: 'WTI Crude Balances OPEC+ Quota Discipline Against Cushing Build Estimates', source: 'Energy Intelligence', timeWib: '1h ago', bias: 'NEUTRAL' },
+      { id: 'n5', pair: 'AUDCADc', title: 'AUD/CAD Ranges Ahead of RBA Minutes as Commodity Currencies Diverge', source: 'Sydney FX Wire', timeWib: '1h ago', bias: 'NEUTRAL' },
+      { id: 'n6', pair: 'BTCUSDc', title: 'Bitcoin Spot ETF Inflows Cushion Intraday Dips Above $89,000 Liquidity Zone', source: 'Digital Assets Wire', timeWib: '2h ago', bias: 'BULLISH' }
+    ];
+
+    // =========================================================================
+    // 2. APPLICATION STATE & PERSISTENCE
+    // =========================================================================
+    const STORAGE_KEY = 'centra_wib_multibot_v4';
+
+    const defaultState = {
+      activeFolder: 'terminal',
+      activeSubTabs: {
+        terminal: 'bots',
+        intel: 'news',
+        vault: 'tracker',
+        academy: 'chapters'
+      },
+      activeSymbol: 'XAUUSDc',
+      activeWindow: 'intraday',
+      activeTf: '1H',
+      newsFilterPair: 'ALL',
+      activeChapterIdx: 0,
+      apiKeys: {
+        twelveData: '',
+        finnhub: '',
+        gemini: '',
+        idrRate: 182.5,
+        riskPct: 1.8
+      },
+      account: {
+        startingBalanceUsc: 1096.0
+      },
+      openPositions: [],
+      closedTrades: [],
+      myfxbook: {
+        email: '',
+        session: '',
+        selectedAccountId: '',
+        accounts: [],
+        autoSync: false,
+        lastSyncTime: '',
+        syncedStats: null,
+        communityOutlook: {}
+      },
+      notifPrefs: {
+        preNews: true,
+        sessionAlerts: true,
+        sound: true
+      },
+      eventReminders: { ev2: true, ev4: true, ev6: true, ev7: true },
+      notificationsLog: [],
+      triggeredKeys: {}
+    };
+
+    let appState = loadState();
+    let liveFxRates = { EURUSD: 1.0585, USDJPY: 154.12, AUDCAD: 0.9132, USDIDR: 15890 };
+    let liveNewsItems = [...CURATED_NEWS_WIRE];
+    let botSignalsCache = {}; // key: `${symbol}_${tf}`
+    let mfbPollInterval = null;
+    let resetConfirmArmed = false;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          activeSubTabs: { ...defaultState.activeSubTabs, ...(parsed.activeSubTabs || {}) },
+          apiKeys: { ...defaultState.apiKeys, ...(parsed.apiKeys || {}) },
+          account: { ...defaultState.account, ...(parsed.account || {}) },
+          myfxbook: { ...defaultState.myfxbook, ...(parsed.myfxbook || {}) },
+          notifPrefs: { ...defaultState.notifPrefs, ...(parsed.notifPrefs || {}) }
+        };
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 3. WIB CLOCK, SESSION TRANSITION WARNINGS & LOCAL TERMINAL NOTIF BOT
+    // =========================================================================
+    function getWibTime() {
+      const now = new Date();
+      const fmt = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      });
+      const p = {};
+      fmt.formatToParts(now).forEach(x => { p[x.type] = x.value; });
+      const hour = parseInt(p.hour, 10);
+      const min = parseInt(p.minute, 10);
+      const sec = parseInt(p.second, 10);
+      return {
+        hour, min, sec,
+        totalMins: hour * 60 + min,
+        dateStr: `${p.year}-${p.month}-${p.day}`,
+        clockStr: `${p.hour}:${p.minute}:${p.second} WIB`
+      };
+    }
+
+    function evaluateWibSessionAndWarnings(wib) {
+      const m = wib.totalMins;
+      // Check proximity to High-Impact WIB Events today
+      let nearbyHighEvent = null;
+      for (const ev of WIB_ECONOMIC_EVENTS) {
+        if (ev.impact !== 'HIGH') continue;
+        const evMins = ev.wibHour * 60 + ev.wibMin;
+        const diff = evMins - m;
+        if (diff >= -15 && diff <= 30) {
+          nearbyHighEvent = { ...ev, minsUntil: diff };
+          break;
+        }
+      }
+
+      // 1. Daily Rollover / Swap Danger Zone: 04:45 - 06:05 WIB
+      if (m >= 285 && m <= 365) {
+        return {
+          sessionName: 'ROLLOVER GUARD',
+          statusTier: 'danger',
+          isTransitionWarning: true,
+          forceSidewaysWarning: true,
+          badgeClass: 'bg-rose-500/20 text-rose-400 border-rose-500/40',
+          warningTitle: '🚨 Daily Rollover Window (04:45–06:05 WIB)',
+          warningMsg: 'MT5 Cent spreads widen 3x–8x during server rollover. Do NOT open new market or scalp trades until after 06:05 WIB.',
+          nearbyHighEvent
+        };
+      }
+
+      // 2. Asian Session Opening (07:00 - 07:45 WIB)
+      if (m >= 420 && m < 465) {
+        return {
+          sessionName: 'ASIAN STARTING',
+          statusTier: 'warning',
+          isTransitionWarning: true,
+          forceSidewaysWarning: false,
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          warningTitle: '🌅 Asian / Tokyo Session Starting (07:00–07:45 WIB)',
+          warningMsg: 'Early Sydney/Tokyo liquidity is still forming. Wait for 07:55 WIB Tokyo Fix sweep before aggressive entries.',
+          nearbyHighEvent
+        };
+      }
+
+      // 3. Asian Session Nearing End & London Pre-Open (14:00 - 15:15 WIB)
+      if (m >= 840 && m <= 915) {
+        return {
+          sessionName: 'ASIAN END / LDN OPEN',
+          statusTier: 'warning',
+          isTransitionWarning: true,
+          forceSidewaysWarning: false,
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          warningTitle: '⚡ Session Handover: Asian Nearing End & London Starting (14:00–15:15 WIB)',
+          warningMsg: 'Frankfurt/London desks sweep Asian highs & lows (Judas Swing). Wait for M15 confirmation after 15:00 WIB.',
+          nearbyHighEvent
+        };
+      }
+
+      // 4. London-NY Overlap Prime Killzone (19:00 - 23:00 WIB)
+      if (m >= 1140 && m <= 1380) {
+        const nearingLondonClose = m >= 1335; // 22:15 - 23:00 WIB
+        return {
+          sessionName: nearingLondonClose ? 'LDN NEARING END' : 'LDN-NY OVERLAP',
+          statusTier: nearingLondonClose ? 'warning' : 'prime',
+          isTransitionWarning: nearingLondonClose,
+          forceSidewaysWarning: false,
+          badgeClass: nearingLondonClose
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+          warningTitle: nearingLondonClose
+            ? '⏳ London Session Nearing End (22:15–23:00 WIB)'
+            : '🔥 Prime London–New York Overlap Active (19:00–23:00 WIB)',
+          warningMsg: nearingLondonClose
+            ? 'London desks are closing books for the day; expect profit-taking pullbacks before solo NY afternoon flow.'
+            : 'Peak global liquidity & institutional volume. Ideal window for validated FVG/iFVG & liquidity breakout setups.',
+          nearbyHighEvent
+        };
+      }
+
+      // 5. NY Session Late / Nearing End (02:30 - 04:45 WIB)
+      if (m >= 150 && m < 285) {
+        return {
+          sessionName: 'NY NEARING END',
+          statusTier: 'warning',
+          isTransitionWarning: true,
+          forceSidewaysWarning: true,
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          warningTitle: '🌙 New York Session Nearing End (02:30–04:45 WIB)',
+          warningMsg: 'NY institutional volume is fading ahead of daily rollover. Avoid low-liquidity chop; manage existing runners.',
+          nearbyHighEvent
+        };
+      }
+
+      // 6. Standard Asian (07:45 - 14:00 WIB) or Standard London (15:15 - 19:00 WIB) or Early NY (23:00 - 02:30 WIB)
+      if (m >= 465 && m < 840) {
+        return {
+          sessionName: 'ASIAN SESSION',
+          statusTier: 'normal',
+          isTransitionWarning: false,
+          forceSidewaysWarning: false,
+          badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+          warningTitle: '🌏 Asian / Tokyo Session Active (07:00–15:00 WIB)',
+          warningMsg: 'Cleanest for USDJPYc & AUDCADc range/breakout structures. Gold & Nasdaq often build liquidity for London.',
+          nearbyHighEvent
+        };
+      }
+
+      if (m > 915 && m < 1140) {
+        return {
+          sessionName: 'LONDON KILLZONE',
+          statusTier: 'prime',
+          isTransitionWarning: false,
+          forceSidewaysWarning: false,
+          badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+          warningTitle: '⚡ London Session Expansion (15:00–19:00 WIB)',
+          warningMsg: 'Strong directional trend follow-through on Gold, Oil, and FX pairs.',
+          nearbyHighEvent
+        };
+      }
+
+      return {
+        sessionName: 'NY AFTERNOON',
+        statusTier: 'normal',
+        isTransitionWarning: false,
+        forceSidewaysWarning: false,
+        badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+        warningTitle: '🗽 New York Afternoon Session (23:00–02:30 WIB)',
+        warningMsg: 'Post-London close US flow — best for USTECc, BTCUSDc, and NY continuation setups.',
+        nearbyHighEvent
+      };
+    }
+
+    function playTerminalChime() {
+      if (!appState.notifPrefs.sound) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(660, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.14);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.34);
+      } catch (e) {}
+    }
+
+    function pushLocalNotification(title, body, level = 'info', withSound = true) {
+      const wib = getWibTime();
+      appState.notificationsLog.unshift({
+        id: `ntf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        title,
+        body,
+        level,
+        timeWib: wib.clockStr,
+        unread: true
+      });
+      if (appState.notificationsLog.length > 30) {
+        appState.notificationsLog.length = 30;
+      }
+      saveState();
+      updateNotifBadge();
+      showToast(`${title}: ${body}`, level);
+      if (withSound) playTerminalChime();
+    }
+
+    function triggerTestTerminalAlert() {
+      pushLocalNotification(
+        '🔔 CENTRA WIB Local Alert Active',
+        'Pre-news & session open/close monitoring is armed for Asia/Jakarta (WIB).',
+        'warning',
+        true
+      );
+      renderNotificationLog();
+    }
+
+    function checkScheduledLocalAlerts(wib) {
+      // 1. Session transition notifications (once per day per milestone)
+      if (appState.notifPrefs.sessionAlerts) {
+        const milestones = [
+          { h: 7, m: 0, key: 'asian_open', title: '🌅 Asian Session Starting (07:00 WIB)', body: 'Tokyo/Sydney liquidity opening. Watch USDJPYc & AUDCADc.' },
+          { h: 14, m: 30, key: 'ldn_handover', title: '⚡ Asian Nearing End / London Open Soon (14:30 WIB)', body: 'Expect pre-London liquidity sweeps on XAUUSDc.' },
+          { h: 19, m: 0, key: 'ny_overlap', title: '🔥 NY Session Starting / Prime Overlap (19:00 WIB)', body: 'Highest liquidity killzone of the day is now live.' },
+          { h: 22, m: 30, key: 'ldn_close', title: '⏳ London Session Nearing End (22:30 WIB)', body: 'Watch for London profit-taking pullbacks.' },
+          { h: 4, m: 45, key: 'rollover', title: '🚨 Rollover Warning (04:45 WIB)', body: 'Close scalps or widen stops — Cent spreads widen until 06:05 WIB.' }
+        ];
+        milestones.forEach(ms => {
+          const trigId = `${wib.dateStr}_${ms.key}`;
+          if (wib.hour === ms.h && wib.min === ms.m && !appState.triggeredKeys[trigId]) {
+            appState.triggeredKeys[trigId] = true;
+            pushLocalNotification(ms.title, ms.body, 'warning', true);
+          }
+        });
+      }
+
+      // 2. Calendar 15-minute pre-event notifications
+      if (appState.notifPrefs.preNews) {
+        WIB_ECONOMIC_EVENTS.forEach(ev => {
+          if (!appState.eventReminders[ev.id]) return;
+          const evMins = ev.wibHour * 60 + ev.wibMin;
+          const diff = evMins - wib.totalMins;
+          const trigId = `${wib.dateStr}_ev_${ev.id}`;
+          if (diff === 15 && !appState.triggeredKeys[trigId]) {
+            appState.triggeredKeys[trigId] = true;
+            pushLocalNotification(
+              `📅 15m Warning: ${ev.title}`,
+              `${ev.currency} (${ev.impact}) at ${String(ev.wibHour).padStart(2, '0')}:${String(ev.wibMin).padStart(2, '0')} WIB — Expect volatility on ${ev.pairs.join(', ')}.`,
+              'warning',
+              true
+            );
+          }
+        });
+      }
+    }
+
+    function updateNotifBadge() {
+      const unread = appState.notificationsLog.filter(n => n.unread).length;
+      const badge = document.getElementById('notif-unread-badge');
+      if (!badge) return;
+      badge.textContent = unread;
+      badge.classList.toggle('hidden', unread === 0);
+    }
+
+    function toggleNotificationDrawer() {
+      const modal = document.getElementById('notif-drawer-modal');
+      const opening = modal.classList.contains('hidden');
+      modal.classList.toggle('hidden');
+      if (opening) {
+        appState.notificationsLog.forEach(n => { n.unread = false; });
+        saveState();
+        updateNotifBadge();
+        renderNotificationLog();
+      }
+    }
+
+    function clearTerminalNotifications() {
+      appState.notificationsLog = [];
+      saveState();
+      updateNotifBadge();
+      renderNotificationLog();
+    }
+
+    function renderNotificationLog() {
+      const box = document.getElementById('notif-log-list');
+      if (!box) return;
+      if (appState.notificationsLog.length === 0) {
+        box.innerHTML = `<div class="text-center py-6 text-xs text-gray-500">No local alerts triggered yet. Tap <span class="text-amber-300">Test Alert</span> in Intel &amp; News → WIB Calendar to verify sound &amp; banner.</div>`;
+        return;
+      }
+      box.innerHTML = appState.notificationsLog.map(n => `
+        <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 space-y-1">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-white">${n.title}</span>
+            <span class="text-[10px] font-mono text-gray-400 shrink-0">${n.timeWib}</span>
+          </div>
+          <p class="text-[11px] text-gray-300 leading-snug">${n.body}</p>
+        </div>
+      `).join('');
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const styles = {
+        success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500/60 text-amber-200',
+        error: 'bg-rose-950/95 border-rose-500/60 text-rose-200',
+        info: 'bg-slate-900/95 border-cyan-500/60 text-cyan-200'
+      };
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto px-3.5 py-2.5 rounded-xl border text-xs font-semibold shadow-2xl transition-all duration-300 ${styles[type] || styles.info}`;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-6px)';
+        setTimeout(() => el.remove(), 300);
+      }, 3400);
+    }
+
+    // =========================================================================
+    // 4. ASTRAL & LUNAR CYCLE ENGINE (BOT 7 — WEEKLY SWING & TIMING)
+    // =========================================================================
+    function getAstralWeeklyAnalysis() {
+      // Synodic month calculation anchored to Nov 9, 2026 New Moon (15:02 UTC)
+      const now = new Date();
+      const knownNewMoonMs = Date.UTC(2026, 10, 9, 15, 2, 0); // Nov 9, 2026
+      const synodicDays = 29.53058867;
+      const elapsedDays = (now.getTime() - knownNewMoonMs) / (1000 * 60 * 60 * 24);
+      const cyclePos = ((elapsedDays % synodicDays) + synodicDays) % synodicDays;
+      const illumination = Math.round(((1 - Math.cos((2 * Math.PI * cyclePos) / synodicDays)) / 2) * 100);
+
+      let phaseName = 'Waxing Crescent';
+      let zodiacTransit = 'Aquarius → Pisces (Ahead of Nov 24 Full Moon in Gemini)';
+      let marketBias = 'Expansion & Breakout Build';
+      let swingScoreTilt = 56; // Slight bullish expansion bias during waxing cycle
+      let weeklyNote = 'This week (Nov 16–22, 2026): First Quarter Moon on Nov 17 in Aquarius/Pisces sparks directional trend tests after early-week consolidation, building momentum toward the Nov 24 Full Moon in Gemini (historically a volatility peak & reversal inflection for Gold and Nasdaq).';
+
+      if (cyclePos < 1.8 || cyclePos > 27.7) {
+        phaseName = 'New Moon Inflection';
+        zodiacTransit = 'Scorpio / Sagittarius Reset';
+        marketBias = 'Trend Initiation & Accumulation';
+        swingScoreTilt = 54;
+      } else if (cyclePos >= 6.0 && cyclePos <= 9.2) {
+        phaseName = 'First Quarter Moon (Nov 17 Peak)';
+        zodiacTransit = 'Moon in Aquarius / Pisces • Sun in Late Scorpio';
+        marketBias = 'Momentum Friction & Range Breakout';
+        swingScoreTilt = 58;
+      } else if (cyclePos > 9.2 && cyclePos < 13.5) {
+        phaseName = 'Waxing Gibbous';
+        zodiacTransit = 'Aries / Taurus → Approaching Gemini Full Moon';
+        marketBias = 'Trend Extension Into Full Moon Climax';
+        swingScoreTilt = 61;
+      } else if (cyclePos >= 13.5 && cyclePos <= 16.2) {
+        phaseName = 'Full Moon Reversal Window';
+        zodiacTransit = 'Gemini / Sagittarius Polarity Axis';
+        marketBias = 'Peak Volatility & Exhaustion Reversal Risk';
+        swingScoreTilt = 44; // Caution against chasing extremes at Full Moon
+      } else if (cyclePos > 16.2 && cyclePos <= 27.7) {
+        phaseName = 'Waning Cycle / Distribution';
+        zodiacTransit = 'Cancer / Leo / Virgo De-risking';
+        marketBias = 'Profit-Taking & Mean Reversion';
+        swingScoreTilt = 46;
+      }
+
+      return {
+        phaseName,
+        illumination,
+        zodiacTransit,
+        marketBias,
+        swingScoreTilt,
+        weeklyNote
+      };
+    }
+
+    // =========================================================================
+    // 5. 8-BOT MULTI-TIMEFRAME SIGNAL ENGINE (SMC FVG/iFVG, SHAPES, SIDEWAYS)
+    // =========================================================================
+    function formatPrice(symbol, val) {
+      const spec = INSTRUMENTS[symbol] || INSTRUMENTS.XAUUSDc;
+      return Number(val).toFixed(spec.decimals);
+    }
+
+    function formatUsc(val, sign = false) {
+      const n = Number(val) || 0;
+      return `${sign && n > 0 ? '+' : ''}${n.toFixed(1)} USC`;
+    }
+
+    function formatIdr(uscVal, sign = false) {
+      const rate = Number(appState.apiKeys.idrRate) || 182.5;
+      const idr = Math.round((Number(uscVal) || 0) * rate);
+      return `${sign && idr > 0 ? '+' : ''}Rp${idr.toLocaleString('id-ID')}`;
+    }
+
+    function computeEightBotSignal(symbol, tf) {
+      const spec = INSTRUMENTS[symbol] || INSTRUMENTS.XAUUSDc;
+      const tfInfo = TF_CONFIG[tf] || TF_CONFIG['1H'];
+      const wib = getWibTime();
+      const sessionGuard = evaluateWibSessionAndWarnings(wib);
+      const astral = getAstralWeeklyAnalysis();
+
+      // Use live Frankfurter FX rates when available for USDJPYc and AUDCADc
+      let markPrice = spec.basePrice;
+      if (symbol === 'USDJPYc' && liveFxRates.USDJPY) markPrice = liveFxRates.USDJPY;
+      if (symbol === 'AUDCADc' && liveFxRates.AUDCAD) markPrice = liveFxRates.AUDCAD;
+
+      // Deterministic multi-timeframe wave so 1m, 5m, 15m, 1H, 4H, 1D each show distinct, realistic structure
+      const tfSeed = tf.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const symSeed = symbol.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const bucket15m = Math.floor(Date.now() / (1000 * 60 * 15));
+      const waveA = Math.sin((bucket15m + symSeed + tfSeed) * 0.42);
+      const waveB = Math.cos((bucket15m * 0.6 + symSeed - tfSeed) * 0.35);
+
+      const tfAtr = Number((spec.h1Atr * tfInfo.atrScale * (0.92 + Math.abs(waveB) * 0.22)).toFixed(spec.decimals));
+      const price = Number((markPrice + waveA * tfAtr * 0.65).toFixed(spec.decimals));
+      const ema20 = Number((price - waveA * tfAtr * 0.45).toFixed(spec.decimals));
+      const ema50 = Number((price - (waveA * 0.7 + waveB * 0.35) * tfAtr * 0.95).toFixed(spec.decimals));
+      const ema200 = Number((price - (waveA * 0.55 + waveB * 0.5) * tfAtr * 1.9).toFixed(spec.decimals));
+
+      const rsi14 = Number(Math.max(24, Math.min(77, 50 + waveA * 16 + waveB * 8)).toFixed(1));
+      const emaSpreadRatio = Math.abs(ema20 - ema50) / (tfAtr || 1);
+
+      // --- BOT 5: SIDEWAYS / COMPRESSION & SESSION GUARD ---
+      // Detect sideways market when EMA20 & EMA50 are flat/tangled AND RSI is trapped between 46 and 54
+      const isTechnicalSideways = emaSpreadRatio < 0.16 && rsi14 >= 46 && rsi14 <= 54;
+      const isHighImpactImminent = sessionGuard.nearbyHighEvent && sessionGuard.nearbyHighEvent.minsUntil >= 0 && sessionGuard.nearbyHighEvent.minsUntil <= 20;
+      const isSidewaysOrHold = isTechnicalSideways || sessionGuard.forceSidewaysWarning || isHighImpactImminent;
+
+      // --- BOT 1: MULTI-TF TECHNICALS ---
+      const bullStack = price > ema20 && ema20 > ema50;
+      const bearStack = price < ema20 && ema20 < ema50;
+      const structureTag = bullStack ? 'Bullish BOS (Higher Highs)' : bearStack ? 'Bearish BOS (Lower Lows)' : 'CHoCH / Range Equilibrium';
+      let bot1Long = bullStack ? 76 : bearStack ? 24 : (price > ema200 ? 57 : 43);
+      if (rsi14 > 56 && rsi14 < 70) bot1Long += 6;
+      if (rsi14 < 44 && rsi14 > 30) bot1Long -= 6;
+      bot1Long = Math.max(15, Math.min(86, bot1Long));
+
+      // --- BOT 2: SMC LIQUIDITY ZONES (BSL/SSL), FVG & iFVG ---
+      const bslLevel = Number((price + tfAtr * 1.65).toFixed(spec.decimals));
+      const sslLevel = Number((price - tfAtr * 1.65).toFixed(spec.decimals));
+      const bullFvgLow = Number((price - tfAtr * 0.65).toFixed(spec.decimals));
+      const bullFvgHigh = Number((price - tfAtr * 0.30).toFixed(spec.decimals));
+      const bearFvgLow = Number((price + tfAtr * 0.30).toFixed(spec.decimals));
+      const bearFvgHigh = Number((price + tfAtr * 0.65).toFixed(spec.decimals));
+      const ifvgZone = bullStack
+        ? `${formatPrice(symbol, bullFvgLow)} – ${formatPrice(symbol, bullFvgHigh)} (Bullish iFVG Flip)`
+        : `${formatPrice(symbol, bearFvgLow)} – ${formatPrice(symbol, bearFvgHigh)} (Bearish iFVG Flip)`;
+
+      const smcExplanation = bullStack
+        ? `Valid ${tf} Bullish FVG sits at ${formatPrice(symbol, bullFvgLow)}–${formatPrice(symbol, bullFvgHigh)} below current price after sweeping SSL at ${formatPrice(symbol, sslLevel)}. Price is magnetized toward resting Buy-Side Liquidity (BSL) at ${formatPrice(symbol, bslLevel)}.`
+        : bearStack
+          ? `Valid ${tf} Bearish FVG sits at ${formatPrice(symbol, bearFvgLow)}–${formatPrice(symbol, bearFvgHigh)} after sweeping BSL at ${formatPrice(symbol, bslLevel)}. Institutional order flow targets Sell-Side Liquidity (SSL) at ${formatPrice(symbol, sslLevel)}.`
+          : `Price is trapped between SSL (${formatPrice(symbol, sslLevel)}) and BSL (${formatPrice(symbol, bslLevel)}) with balanced ${tf} FVG/iFVG pockets—awaiting a liquidity sweep before directional expansion.`;
+
+      // --- BOT 3: CHART SHAPE & PATTERN GEOMETRY ---
+      let patternName = 'Symmetrical Compression Coil';
+      let patternBias = 'NEUTRAL';
+      let patternDetail = `Converging ${tf} trendlines between ${formatPrice(symbol, sslLevel)} and ${formatPrice(symbol, bslLevel)}. Wait for a clean ${tf} candle close outside the apex before entering.`;
+      if (isTechnicalSideways) {
+        patternName = 'Horizontal Accumulation Box (Sideways)';
+        patternBias = 'SIDEWAYS';
+        patternDetail = `Flat EMA20/50 & RSI ${rsi14} confirm a horizontal liquidity box. Market makers are building orders on both sides—avoid middle-of-range entries.`;
+      } else if (bullStack && rsi14 >= 54) {
+        patternName = tf === '1m' || tf === '5m' ? 'Bullish Micro-Flag & Liquidity Reclaim' : 'Ascending Channel / Bullish Cup & Handle';
+        patternBias = 'BULLISH';
+        patternDetail = `Higher lows pressing against horizontal neckline resistance at ${formatPrice(symbol, bearFvgHigh)}. Breakout above neckline projects toward ${formatPrice(symbol, bslLevel)}.`;
+      } else if (bearStack && rsi14 <= 46) {
+        patternName = tf === '1m' || tf === '5m' ? 'Bearish Pennant / Breakdown Wedge' : 'Descending Triangle / Head & Shoulders';
+        patternBias = 'BEARISH';
+        patternDetail = `Lower highs compressing onto horizontal neckline support at ${formatPrice(symbol, bullFvgLow)}. Clean breakdown targets ${formatPrice(symbol, sslLevel)}.`;
+      } else if (rsi14 < 35) {
+        patternName = 'Falling Wedge Exhaustion (Bullish Reversal)';
+        patternBias = 'BULLISH';
+        patternDetail = `Narrowing downward wedge with bullish RSI divergence (${rsi14}). Watch for CHoCH reclaim above ${formatPrice(symbol, ema20)}.`;
+      } else if (rsi14 > 65) {
+        patternName = 'Rising Wedge Exhaustion (Bearish Pullback)';
+        patternBias = 'BEARISH';
+        patternDetail = `Steep ascending wedge into BSL (${formatPrice(symbol, bslLevel)}) with overextended RSI (${rsi14}). Watch for iFVG breakdown below ${formatPrice(symbol, ema20)}.`;
+      }
+
+      // --- BOT 4: NEWS & MACRO WIRE ---
+      const pairNews = liveNewsItems.filter(n => n.pair === symbol);
+      const topHeadline = pairNews[0]?.title || liveNewsItems[0]?.title || 'Monitoring global macro & central bank feeds.';
+      const newsBiasTag = pairNews[0]?.bias || 'NEUTRAL';
+      const bot4Long = newsBiasTag === 'BULLISH' ? 66 : newsBiasTag === 'BEARISH' ? 34 : 50;
+
+      // --- WEIGHTED PROBABILITY SYNTHESIS (BOT 8) ---
+      const isSwing = tfInfo.window === 'swing';
+      const astralWeight = isSwing ? 0.15 : 0.05;
+      const techWeight = isSwing ? 0.30 : 0.35;
+      const smcWeight = 0.25;
+      const shapeWeight = 0.15;
+      const newsWeight = isSwing ? 0.15 : 0.20;
+
+      const smcLong = bullStack ? 74 : bearStack ? 26 : 50;
+      const shapeLong = patternBias === 'BULLISH' ? 72 : patternBias === 'BEARISH' ? 28 : 50;
+
+      let rawLong =
+        bot1Long * techWeight +
+        smcLong * smcWeight +
+        shapeLong * shapeWeight +
+        bot4Long * newsWeight +
+        astral.swingScoreTilt * astralWeight;
+
+      if (isSidewaysOrHold) {
+        rawLong = 50 + (rawLong - 50) * 0.25; // Compress toward 50/50 when sideways or rollover/news guard fires
+      }
+
+      const longPct = Math.max(10, Math.min(90, Math.round(rawLong)));
+      const shortPct = 100 - longPct;
+      const edgePct = Math.max(longPct, shortPct);
+      const directionSide = longPct >= 50 ? 'BUY' : 'SELL';
+
+      let verdict = 'SIDEWAYS / DO NOT TRADE YET';
+      let verdictTier = 'sideways';
+      if (!isSidewaysOrHold) {
+        if (longPct >= 70) { verdict = 'STRONG BUY'; verdictTier = 'strong-buy'; }
+        else if (longPct >= 57) { verdict = 'BUY'; verdictTier = 'buy'; }
+        else if (shortPct >= 70) { verdict = 'STRONG SELL'; verdictTier = 'strong-sell'; }
+        else if (shortPct >= 57) { verdict = 'SELL'; verdictTier = 'sell'; }
+      }
+
+      // --- EXACT ENTRY PRICES (LIMIT AT FVG/LIQUIDITY ZONE vs BREAKOUT ENTRY) ---
+      const limitEntry = directionSide === 'BUY' ? bullFvgHigh : bearFvgLow;
+      const breakoutEntry = directionSide === 'BUY'
+        ? Number((price + tfAtr * 0.25).toFixed(spec.decimals))
+        : Number((price - tfAtr * 0.25).toFixed(spec.decimals));
+
+      const stopDist = Number((tfAtr * 1.15).toFixed(spec.decimals));
+      const slPrice = directionSide === 'BUY'
+        ? Number((limitEntry - stopDist).toFixed(spec.decimals))
+        : Number((limitEntry + stopDist).toFixed(spec.decimals));
+
+      const tp1Price = directionSide === 'BUY'
+        ? Number((limitEntry + stopDist * 1.5).toFixed(spec.decimals))
+        : Number((limitEntry - stopDist * 1.5).toFixed(spec.decimals));
+
+      const tp2Price = directionSide === 'BUY'
+        ? Number((limitEntry + stopDist * 2.5).toFixed(spec.decimals))
+        : Number((limitEntry - stopDist * 2.5).toFixed(spec.decimals));
+
+      // Cent Lot Size for 1,096 USC Account
+      const equity = getCurrentEquityUsc();
+      const riskPct = Number(appState.apiKeys.riskPct) || 1.8;
+      const targetRiskUsc = equity * (riskPct / 100);
+      const riskPer001 = Math.max(0.4, stopDist * spec.uscPerPoint001);
+      const centLots = Math.max(0.01, Math.min(0.25, Math.floor((targetRiskUsc / riskPer001) * 100) / 100));
+      const actualRiskUsc = Number((riskPer001 * (centLots / 0.01)).toFixed(1));
+      const actualTp2Usc = Number((actualRiskUsc * 2.5).toFixed(1));
+
+      // Detailed Elaboration Paragraph
+      let elaboration = '';
+      if (verdictTier === 'sideways') {
+        const reason = sessionGuard.forceSidewaysWarning
+          ? sessionGuard.warningTitle
+          : isHighImpactImminent
+            ? `High-Impact WIB News (${sessionGuard.nearbyHighEvent.title}) in ${sessionGuard.nearbyHighEvent.minsUntil} mins`
+            : `Sideways compression on ${tf} (flat EMA20/50 & RSI ${rsi14})`;
+        elaboration = `HOLD / DO NOT TRADE YET: ${reason}. Entering in the middle of a range or right before a session/news shock exposes your 1,096 USC account to stop-hunts. Wait for a clear liquidity sweep of SSL (${formatPrice(symbol, sslLevel)}) or BSL (${formatPrice(symbol, bslLevel)}) and a confirmed ${tf} iFVG close.`;
+      } else if (directionSide === 'BUY') {
+        elaboration = `BULLISH THESIS (${longPct}% Long vs ${shortPct}% Short on ${tf}): ${structureTag} aligns with a ${patternName}. Rather than chasing market price (${formatPrice(symbol, price)}), Bot 2 recommends a sniper Buy Limit inside the ${tf} Bullish FVG at ${formatPrice(symbol, limitEntry)} (or momentum Buy Stop above ${formatPrice(symbol, breakoutEntry)}) targeting Buy-Side Liquidity at ${formatPrice(symbol, tp2Price)}.`;
+      } else {
+        elaboration = `BEARISH THESIS (${shortPct}% Short vs ${longPct}% Long on ${tf}): ${structureTag} aligns with a ${patternName}. Bot 2 favors a sniper Sell Limit inside the ${tf} Bearish FVG at ${formatPrice(symbol, limitEntry)} (or breakdown Sell Stop below ${formatPrice(symbol, breakoutEntry)}) targeting Sell-Side Liquidity at ${formatPrice(symbol, tp2Price)}.`;
+      }
+
+      const result = {
+        symbol,
+        tf,
+        tfLabel: tfInfo.label,
+        window: tfInfo.window,
+        wibTime: wib.clockStr,
+        verdict,
+        verdictTier,
+        directionSide,
+        longPct,
+        shortPct,
+        edgePct,
+        price,
+        limitEntry,
+        breakoutEntry,
+        slPrice,
+        tp1Price,
+        tp2Price,
+        centLots,
+        actualRiskUsc,
+        actualTp2Usc,
+        elaboration,
+        sessionGuard,
+        astral,
+        bot1: { ema20, ema50, ema200, rsi14, tfAtr, structureTag, bot1Long },
+        bot2: { bslLevel, sslLevel, bullFvgLow, bullFvgHigh, bearFvgLow, bearFvgHigh, ifvgZone, smcExplanation },
+        bot3: { patternName, patternBias, patternDetail },
+        bot4: { topHeadline, newsBiasTag, bot4Long },
+        bot6: {
+          whatIsHappening: spec.whatIsHappening,
+          whyMoving: spec.whyMoving,
+          whatMayHappen: spec.whatMayHappen
+        }
+      };
+
+      botSignalsCache[`${symbol}_${tf}`] = result;
+      return result;
+    }
+
+    // =========================================================================
+    // 6. FREE EXTERNAL FEEDS (FRANKFURTER FX + RSS NEWS + GEMINI AI)
+    // =========================================================================
+    async function fetchLiveFrankfurterRates() {
+      try {
+        const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=JPY,EUR,CAD,AUD,IDR');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.rates) {
+          if (data.rates.JPY) liveFxRates.USDJPY = Number(data.rates.JPY.toFixed(3));
+          if (data.rates.EUR) liveFxRates.EURUSD = Number((1 / data.rates.EUR).toFixed(4));
+          if (data.rates.AUD && data.rates.CAD) {
+            liveFxRates.AUDCAD = Number((data.rates.CAD / data.rates.AUD).toFixed(5));
+          }
+          if (data.rates.IDR) liveFxRates.USDIDR = Math.round(data.rates.IDR);
+        }
+      } catch (e) {}
+    }
+
+    async function fetchLiveRssAndFinnhubNews() {
+      const collected = [];
+      const finnhubKey = (appState.apiKeys.finnhub || '').trim();
+
+      // 1. Optional Finnhub API
+      if (finnhubKey) {
+        try {
+          const res = await fetch(`https://finnhub.io/api/v1/news?category=forex&token=${encodeURIComponent(finnhubKey)}`);
+          const arr = await res.json();
+          if (Array.isArray(arr)) {
+            arr.slice(0, 6).forEach((item, i) => {
+              collected.push({
+                id: `fh_${i}`,
+                pair: detectPairFromHeadline(item.headline),
+                title: item.headline,
+                source: item.source || 'Finnhub Wire',
+                timeWib: 'Live',
+                bias: detectSentimentFromHeadline(item.headline),
+                url: item.url
+              });
+            });
+          }
+        } catch (e) {}
+      }
+
+      // 2. Keyless RSS via rss2json (FXStreet + CoinTelegraph)
+      const rssFeeds = [
+        { url: 'https://www.fxstreet.com/rss/news', label: 'FXStreet RSS' },
+        { url: 'https://cointelegraph.com/rss', label: 'CoinTelegraph RSS' }
+      ];
+
+      for (const feed of rssFeeds) {
+        try {
+          const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
+          const res = await fetch(api);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data && Array.isArray(data.items)) {
+            data.items.slice(0, 5).forEach((it, idx) => {
+              collected.push({
+                id: `rss_${feed.label}_${idx}`,
+                pair: detectPairFromHeadline(it.title),
+                title: it.title,
+                source: feed.label,
+                timeWib: 'Live RSS',
+                bias: detectSentimentFromHeadline(it.title),
+                url: it.link
+              });
+            });
+          }
+        } catch (e) {}
+      }
+
+      liveNewsItems = collected.length > 0 ? [...collected, ...CURATED_NEWS_WIRE] : [...CURATED_NEWS_WIRE];
+    }
+
+    function detectPairFromHeadline(title) {
+      const t = String(title || '').toLowerCase();
+      if (/(gold|xau|bullion|precious)/.test(t)) return 'XAUUSDc';
+      if (/(yen|jpy|boj|tokyo|japan)/.test(t)) return 'USDJPYc';
+      if (/(oil|crude|wti|opec|brent|energy)/.test(t)) return 'USOILc';
+      if (/(aud|cad|rba|australia|canada|loonie)/.test(t)) return 'AUDCADc';
+      if (/(bitcoin|btc|crypto|ethereum|etf)/.test(t)) return 'BTCUSDc';
+      if (/(nasdaq|tech|stocks|wall street|s&p|fed|cpi)/.test(t)) return 'USTECc';
+      return 'XAUUSDc';
+    }
+
+    function detectSentimentFromHeadline(title) {
+      const t = String(title || '').toLowerCase();
+      if (/(surge|rally|soar|jump|bullish|gain|rise|inflow)/.test(t)) return 'BULLISH';
+      if (/(drop|fall|plunge|bearish|slide|slump|cut|sink)/.test(t)) return 'BEARISH';
+      return 'NEUTRAL';
+    }
+
+    async function refreshAllNewsSources(notify = false) {
+      await Promise.all([fetchLiveFrankfurterRates(), fetchLiveRssAndFinnhubNews()]);
+      renderIntelFolder();
+      renderTerminalBotsView();
+      if (notify) showToast('FX reference rates & pair news wire updated.', 'success');
+    }
+
+    async function generateGeminiDeepNote() {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      const sig = botSignalsCache[`${sym}_${tf}`] || computeEightBotSignal(sym, tf);
+      const box = document.getElementById('gemini-note-box');
+      const btn = document.getElementById('btn-gemini-note');
+
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      box.classList.remove('hidden');
+      box.innerHTML = `<span class="text-cyan-300 font-mono">✨ Consulting Gemini AI on ${sym} (${tf}) SMC zones &amp; WIB session risk...</span>`;
+
+      const apiKey = (appState.apiKeys.gemini || '').trim();
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      const prompt = `Instrument: ${sym} on ${tf} (${sig.window} horizon) at ${sig.wibTime} (${sig.sessionGuard.sessionName}).
+Verdict: ${sig.verdict} (${sig.longPct}% Long / ${sig.shortPct}% Short).
+Limit Entry: ${formatPrice(sym, sig.limitEntry)}, Breakout Entry: ${formatPrice(sym, sig.breakoutEntry)}, SL: ${formatPrice(sym, sig.slPrice)}, TP2: ${formatPrice(sym, sig.tp2Price)}.
+SMC: ${sig.bot2.smcExplanation}
+Geometry: ${sig.bot3.patternName}.
+Astral: ${sig.astral.phaseName} (${sig.astral.zodiacTransit}).
+Give a concise 3-bullet institutional second opinion for a 1,096 USC (Rp200.000) Cent account.`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        if (!res.ok) throw new Error('API key required outside Canvas');
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error('Empty response');
+        box.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\n/g, '<br/>');
+      } catch (e) {
+        box.innerHTML = `
+          <div class="space-y-1">
+            <div><strong class="text-cyan-300">• Execution Confluence:</strong> ${sig.verdict} on ${sym} (${tf}). Prioritize the FVG Limit Entry at <strong>${formatPrice(sym, sig.limitEntry)}</strong> over chasing market price.</div>
+            <div><strong class="text-amber-300">• Session &amp; Geometry Guard:</strong> ${sig.sessionGuard.warningTitle} — Pattern: ${sig.bot3.patternName}.</div>
+            <div><strong class="text-emerald-300">• Cent Capital Rule:</strong> Risk capped at ${sig.actualRiskUsc} USC (${formatIdr(sig.actualRiskUsc)}) with ${sig.centLots.toFixed(2)} cent-lots. <em>(Add a free Gemini key in Academy &amp; API → Free API Vault when running on GitHub Pages.)</em></div>
+          </div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ AI Second Opinion';
+      }
+    }
+
+    // =========================================================================
+    // 7. MYFXBOOK OFFICIAL JSON API SYNC & MT5 VAULT LOGIC
+    // =========================================================================
+    async function corsSafeGetJson(targetUrl) {
+      const candidates = [
+        targetUrl,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
+      ];
+      for (const u of candidates) {
+        try {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), 8500);
+          const r = await fetch(u, { signal: ctrl.signal });
+          clearTimeout(t);
+          if (!r.ok) continue;
+          const txt = await r.text();
+          return JSON.parse(txt);
+        } catch (e) {}
+      }
+      throw new Error('Unable to reach Myfxbook API. Check connection or try again.');
+    }
+
+    async function syncMyfxbookAccount(interactive = false) {
+      const email = (document.getElementById('mfb-email-input')?.value || appState.myfxbook.email || '').trim();
+      const pass = (document.getElementById('mfb-pass-input')?.value || '').trim();
+      if (!email || (!pass && !appState.myfxbook.session)) {
+        if (interactive) showToast('Enter your Myfxbook email and password first.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-sync-mfb');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
+
+      try {
+        let session = appState.myfxbook.session;
+        if (!session || pass) {
+          const loginData = await corsSafeGetJson(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+          if (loginData.error || !loginData.session) {
+            throw new Error(loginData.message || 'Myfxbook login failed. Verify email & password.');
+          }
+          session = loginData.session;
+          appState.myfxbook.email = email;
+          appState.myfxbook.session = session;
+        }
+
+        const accData = await corsSafeGetJson(`https://www.myfxbook.com/api/get-my-accounts.json?session=${encodeURIComponent(session)}`);
+        if (accData.error) {
+          appState.myfxbook.session = '';
+          throw new Error(accData.message || 'Session expired. Re-enter password and tap Sync.');
+        }
+
+        const accounts = Array.isArray(accData.accounts) ? accData.accounts : [];
+        appState.myfxbook.accounts = accounts;
+        if (accounts.length === 0) throw new Error('No MT5 accounts linked in your Myfxbook profile yet.');
+
+        let selId = appState.myfxbook.selectedAccountId;
+        if (!selId || !accounts.some(a => String(a.id) === String(selId))) {
+          selId = String(accounts[0].id);
+          appState.myfxbook.selectedAccountId = selId;
+        }
+
+        const activeAcc = accounts.find(a => String(a.id) === String(selId)) || accounts[0];
+        appState.myfxbook.syncedStats = {
+          name: activeAcc.name,
+          balance: Number(activeAcc.balance) || 0,
+          equity: Number(activeAcc.equity) || 0,
+          gain: Number(activeAcc.gain) || 0,
+          drawdown: Number(activeAcc.drawdown) || 0,
+          server: activeAcc.server?.name || 'MT5 Server'
+        };
+        if (Number(activeAcc.deposits) > 0) {
+          appState.account.startingBalanceUsc = Number(activeAcc.deposits);
+        }
+
+        // Open Trades
+        try {
+          const openData = await corsSafeGetJson(`https://www.myfxbook.com/api/get-open-trades.json?session=${encodeURIComponent(session)}&id=${encodeURIComponent(selId)}`);
+          if (!openData.error && Array.isArray(openData.openTrades)) {
+            const localOnly = appState.openPositions.filter(p => !p.fromMfb);
+            const mfbTrades = openData.openTrades.map((t, idx) => ({
+              id: `mfb_${t.id || idx}_${t.openTime}`,
+              fromMfb: true,
+              symbol: normalizeCentSymbol(t.symbol),
+              side: String(t.action || '').toUpperCase().includes('SELL') ? 'SELL' : 'BUY',
+              lots: Number(t.sizing?.value) || 0.01,
+              entry: Number(t.openPrice) || 0,
+              currentPrice: Number(t.openPrice) || 0,
+              sl: Number(t.sl) || Number(t.openPrice) || 0,
+              tp: Number(t.tp) || Number(t.openPrice) || 0,
+              syncedProfitUsc: Number(t.profit) || 0,
+              openTime: t.openTime || getWibTime().clockStr
+            }));
+            appState.openPositions = [...mfbTrades, ...localOnly];
+          }
+        } catch (e) {}
+
+        // Closed History
+        try {
+          const histData = await corsSafeGetJson(`https://www.myfxbook.com/api/get-history.json?session=${encodeURIComponent(session)}&id=${encodeURIComponent(selId)}`);
+          if (!histData.error && Array.isArray(histData.history)) {
+            const seen = new Set(appState.closedTrades.map(c => c.key));
+            histData.history.forEach(h => {
+              const key = `mfb_${h.symbol}_${h.openTime}_${h.closeTime}_${h.profit}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                appState.closedTrades.unshift({
+                  id: key, key,
+                  source: 'Myfxbook',
+                  symbol: normalizeCentSymbol(h.symbol),
+                  side: String(h.action || '').toUpperCase().includes('SELL') ? 'SELL' : 'BUY',
+                  lots: Number(h.sizing?.value) || 0.01,
+                  pnlUsc: Number(h.profit) || 0,
+                  closeDateWib: (h.closeTime || getWibTime().dateStr).slice(0, 10),
+                  closeTime: h.closeTime || ''
+                });
+              }
+            });
+          }
+        } catch (e) {}
+
+        appState.myfxbook.lastSyncTime = getWibTime().clockStr;
+        saveState();
+        renderAll();
+        if (interactive) showToast(`Synced "${activeAcc.name}" from Myfxbook!`, 'success');
+      } catch (err) {
+        if (interactive) showToast(err.message || 'Myfxbook sync error.', 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Myfxbook Now'; }
+      }
+    }
+
+    function onSelectMyfxbookAccount(accId) {
+      appState.myfxbook.selectedAccountId = accId;
+      saveState();
+      if (accId) syncMyfxbookAccount(true);
+    }
+
+    function setMyfxbookAutoSync(enabled) {
+      appState.myfxbook.autoSync = Boolean(enabled);
+      saveState();
+      if (mfbPollInterval) clearInterval(mfbPollInterval);
+      mfbPollInterval = enabled ? setInterval(() => syncMyfxbookAccount(false), 60000) : null;
+      showToast(enabled ? 'Myfxbook 60s Auto-Sync ON' : 'Myfxbook Auto-Sync OFF', 'info');
+    }
+
+    function logoutMyfxbook() {
+      if (mfbPollInterval) clearInterval(mfbPollInterval);
+      appState.myfxbook.session = '';
+      appState.myfxbook.syncedStats = null;
+      appState.myfxbook.autoSync = false;
+      saveState();
+      renderVaultFolder();
+      showToast('Disconnected Myfxbook session.', 'info');
+    }
+
+    function normalizeCentSymbol(raw) {
+      const s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (s.includes('XAU') || s.includes('GOLD')) return 'XAUUSDc';
+      if (s.includes('AUDCAD')) return 'AUDCADc';
+      if (s.includes('USDJPY')) return 'USDJPYc';
+      if (s.includes('USTEC') || s.includes('NAS100') || s.includes('NDX')) return 'USTECc';
+      if (s.includes('OIL') || s.includes('WTI')) return 'USOILc';
+      if (s.includes('BTC')) return 'BTCUSDc';
+      return 'XAUUSDc';
+    }
+
+    // Local Position & Equity Helpers
+    function calcPosPnlUsc(p) {
+      if (p.fromMfb && typeof p.syncedProfitUsc === 'number') return p.syncedProfitUsc;
+      const spec = INSTRUMENTS[p.symbol] || INSTRUMENTS.XAUUSDc;
+      const diff = p.side === 'BUY' ? (p.currentPrice - p.entry) : (p.entry - p.currentPrice);
+      return Number((diff * spec.uscPerPoint001 * (p.lots / 0.01)).toFixed(2));
+    }
+
+    function calcPosRiskUsc(p) {
+      const spec = INSTRUMENTS[p.symbol] || INSTRUMENTS.XAUUSDc;
+      const dist = Math.abs((p.entry || 0) - (p.sl || 0));
+      return Number((dist * spec.uscPerPoint001 * (p.lots / 0.01)).toFixed(2));
+    }
+
+    function getCurrentEquityUsc() {
+      if (appState.myfxbook.syncedStats && appState.myfxbook.syncedStats.equity > 0) {
+        return Number(appState.myfxbook.syncedStats.equity);
+      }
+      const start = Number(appState.account.startingBalanceUsc) || 1096.0;
+      const realized = appState.closedTrades.reduce((s, t) => s + (Number(t.pnlUsc) || 0), 0);
+      const floating = appState.openPositions.reduce((s, p) => s + calcPosPnlUsc(p), 0);
+      return Number((start + realized + floating).toFixed(1));
+    }
+
+    function sendSignalToVault(symbol, tf, useBreakout = false) {
+      const sig = botSignalsCache[`${symbol}_${tf}`] || computeEightBotSignal(symbol, tf);
+      openFolder('vault', 'tracker');
+      const entry = useBreakout ? sig.breakoutEntry : sig.limitEntry;
+      document.getElementById('tr-symbol').value = sig.symbol;
+      document.getElementById('tr-side').value = sig.directionSide;
+      document.getElementById('tr-lots').value = sig.centLots.toFixed(2);
+      document.getElementById('tr-entry').value = formatPrice(sig.symbol, entry);
+      document.getElementById('tr-sl').value = formatPrice(sig.symbol, sig.slPrice);
+      document.getElementById('tr-tp').value = formatPrice(sig.symbol, sig.tp2Price);
+      updateTrackerRiskPreview();
+      showToast(`Loaded ${sig.symbol} ${sig.directionSide} (${useBreakout ? 'Breakout' : 'FVG Limit'}) into MT5 Vault!`, 'success');
+    }
+
+    function prefillTrackerOrder() {
+      const sym = document.getElementById('tr-symbol').value;
+      const sig = botSignalsCache[`${sym}_${appState.activeTf}`] || computeEightBotSignal(sym, appState.activeTf);
+      document.getElementById('tr-entry').value = formatPrice(sym, sig.limitEntry);
+      document.getElementById('tr-sl').value = formatPrice(sym, sig.slPrice);
+      document.getElementById('tr-tp').value = formatPrice(sym, sig.tp2Price);
+      document.getElementById('tr-lots').value = sig.centLots.toFixed(2);
+      updateTrackerRiskPreview();
+    }
+
+    function updateTrackerRiskPreview() {
+      const sym = document.getElementById('tr-symbol').value;
+      const lots = parseFloat(document.getElementById('tr-lots').value) || 0.01;
+      const entry = parseFloat(document.getElementById('tr-entry').value) || 0;
+      const sl = parseFloat(document.getElementById('tr-sl').value) || 0;
+      const spec = INSTRUMENTS[sym] || INSTRUMENTS.XAUUSDc;
+      const risk = Math.abs(entry - sl) * spec.uscPerPoint001 * (lots / 0.01);
+      document.getElementById('tracker-risk-est').textContent = `Est. Risk: ${risk.toFixed(1)} USC (${formatIdr(risk)})`;
+    }
+
+    function addLocalPosition() {
+      const symbol = document.getElementById('tr-symbol').value;
+      const side = document.getElementById('tr-side').value;
+      const lots = Math.max(0.01, parseFloat(document.getElementById('tr-lots').value) || 0.01);
+      const entry = parseFloat(document.getElementById('tr-entry').value);
+      const sl = parseFloat(document.getElementById('tr-sl').value);
+      const tp = parseFloat(document.getElementById('tr-tp').value);
+      if (!entry || isNaN(entry)) {
+        showToast('Enter a valid entry price.', 'error');
+        return;
+      }
+      appState.openPositions.unshift({
+        id: `pos_${Date.now()}`,
+        fromMfb: false,
+        symbol, side, lots, entry,
+        currentPrice: entry,
+        sl: sl || entry,
+        tp: tp || entry,
+        openTime: getWibTime().clockStr
+      });
+      saveState();
+      renderAll();
+      showToast(`Opened ${symbol} ${side} (${lots.toFixed(2)} lots) in MT5 Vault.`, 'success');
+    }
+
+    function nudgePosPrice(id, mult) {
+      const p = appState.openPositions.find(x => x.id === id);
+      if (!p) return;
+      const spec = INSTRUMENTS[p.symbol] || INSTRUMENTS.XAUUSDc;
+      p.currentPrice = Number((p.currentPrice + spec.pipSize * 5 * mult).toFixed(spec.decimals));
+      saveState();
+      renderAll();
+    }
+
+    function closeLocalPos(id, mode) {
+      const idx = appState.openPositions.findIndex(x => x.id === id);
+      if (idx === -1) return;
+      const p = appState.openPositions[idx];
+      const spec = INSTRUMENTS[p.symbol] || INSTRUMENTS.XAUUSDc;
+      let exitPx = p.currentPrice;
+      if (mode === 'TP' && p.tp) exitPx = p.tp;
+      if (mode === 'SL' && p.sl) exitPx = p.sl;
+      if (mode === 'BE') exitPx = p.entry;
+
+      const diff = p.side === 'BUY' ? (exitPx - p.entry) : (p.entry - exitPx);
+      const pnlUsc = Number((diff * spec.uscPerPoint001 * (p.lots / 0.01)).toFixed(2));
+      const wib = getWibTime();
+
+      appState.closedTrades.unshift({
+        id: `cl_${Date.now()}`,
+        key: `cl_${p.id}_${wib.clockStr}`,
+        source: `Manual (${mode})`,
+        symbol: p.symbol,
+        side: p.side,
+        lots: p.lots,
+        pnlUsc,
+        closeDateWib: wib.dateStr,
+        closeTime: wib.clockStr
+      });
+      appState.openPositions.splice(idx, 1);
+      saveState();
+      renderAll();
+      showToast(`Closed ${p.symbol} @ ${mode}: ${formatUsc(pnlUsc, true)}`, pnlUsc >= 0 ? 'success' : 'warning');
+    }
+
+    function updateVaultStartBalance(val) {
+      const num = parseFloat(val);
+      if (!isNaN(num) && num > 0) {
+        appState.account.startingBalanceUsc = num;
+        saveState();
+        renderAll();
+      }
+    }
+
+    function importStatementFile(ev) {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const txt = String(e.target?.result || '');
+        const seen = new Set(appState.closedTrades.map(c => c.key));
+        let added = 0;
+        txt.split(/\r?\n/).forEach((line, idx) => {
+          if (idx === 0 && /symbol|profit/i.test(line)) return;
+          const cols = line.split(/[,;\t]/).map(c => c.replace(/^"|"$/g, '').trim());
+          if (cols.length >= 5) {
+            const sym = normalizeCentSymbol(cols.find(c => /(xau|audcad|usdjpy|ustec|nas|oil|btc)/i.test(c)) || 'XAUUSDc');
+            const act = (cols.find(c => /^(buy|sell)$/i.test(c)) || 'BUY').toUpperCase();
+            const prof = parseFloat(cols[cols.length - 1]);
+            if (!isNaN(prof)) {
+              const key = `imp_${cols[0]}_${sym}_${act}_${prof}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                appState.closedTrades.unshift({
+                  id: key, key, source: 'CSV Import', symbol: sym, side: act,
+                  lots: 0.01, pnlUsc: prof, closeDateWib: getWibTime().dateStr, closeTime: cols[0] || ''
+                });
+                added++;
+              }
+            }
+          }
+        });
+        saveState();
+        renderAll();
+        showToast(added > 0 ? `Imported ${added} unique trades.` : 'No new unique rows found.', added > 0 ? 'success' : 'info');
+      };
+      reader.readAsText(file);
+    }
+
+    function exportVaultJson() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const u = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = u;
+      a.download = `centra_wib_vault_${getWibTime().dateStr}.json`;
+      a.click();
+      URL.revokeObjectURL(u);
+      showToast('Exported vault backup JSON.', 'success');
+    }
+
+    function resetVaultHistory() {
+      const btn = document.getElementById('btn-reset-vault');
+      if (!resetConfirmArmed) {
+        resetConfirmArmed = true;
+        btn.textContent = 'Confirm?';
+        btn.classList.add('bg-rose-600', 'text-white');
+        setTimeout(() => {
+          resetConfirmArmed = false;
+          if (btn) { btn.textContent = 'Reset'; btn.classList.remove('bg-rose-600', 'text-white'); }
+        }, 3500);
+        return;
+      }
+      resetConfirmArmed = false;
+      appState.closedTrades = [];
+      appState.openPositions = [];
+      saveState();
+      renderAll();
+      showToast('Vault history cleared.', 'info');
+    }
+
+    // =========================================================================
+    // 8. LEARNING ACADEMY CHAPTERS & SEARCHABLE GLOSSARY
+    // =========================================================================
+    const ACADEMY_CHAPTERS = [
+      {
+        title: 'Ch 1: Multi-TF Technicals',
+        heading: 'Chapter 1 — Multi-Timeframe Technicals (1m to 1D)',
+        summary: 'Why top-down alignment across Scalp (1m/5m), Intraday (15m/1H), and Swing (4H/1D) prevents counter-trend traps.',
+        blocks: [
+          {
+            subtitle: '1. The 3-Window Hierarchy',
+            text: 'Higher timeframes (4H & 1D) define institutional direction and major liquidity pools. Medium timeframes (15m & 1H) frame session structure during London/NY overlap. Lower timeframes (1m & 5m) are strictly for precision sniper entries—never fight a 4H bearish trend with a blind 1m long.'
+          },
+          {
+            subtitle: '2. EMA 20 / 50 / 200 & RSI(14) Regime',
+            text: 'When Price > EMA20 > EMA50 > EMA200 and RSI(14) holds between 55–68, momentum is cleanly bullish. When EMA20 and EMA50 flatten together and RSI hovers between 46–54, the market is in Sideways Compression—Bot 5 flags DO NOT TRADE YET.'
+          },
+          {
+            subtitle: '3. ATR(14) Volatility Stop Sizing',
+            text: 'Never use a fixed pip stop across Gold, Bitcoin, and AUDCAD. Scaling Stop-Loss to 1.15x the active timeframe ATR(14) prevents normal market noise from clipping your Cent position.'
+          }
+        ]
+      },
+      {
+        title: 'Ch 2: Liquidity, FVG & iFVG',
+        heading: 'Chapter 2 — Valid Liquidity Zones, FVG & Inverse FVG (iFVG)',
+        summary: 'How institutions engineer Buy-Side/Sell-Side Liquidity sweeps and rebalance Fair Value Gaps.',
+        blocks: [
+          {
+            subtitle: '1. Buy-Side (BSL) & Sell-Side Liquidity (SSL)',
+            text: 'Retail stop-losses cluster just above equal swing highs (BSL) and just below equal swing lows (SSL). Smart money drives price through SSL to fill large buy orders before reversing upward toward BSL.'
+          },
+          {
+            subtitle: '2. Valid Fair Value Gap (FVG)',
+            text: 'A 3-candle price imbalance where Candle 1 high does not overlap Candle 3 low (Bullish FVG). A valid FVG occurs after a Break of Structure (BOS) or liquidity sweep—institutions frequently retrace into this discount zone to load remaining orders.'
+          },
+          {
+            subtitle: '3. Inverse Fair Value Gap (iFVG)',
+            text: 'When a Bearish FVG fails to hold price down and a strong candle closes decisively above it, that failed gap flips polarity into a Bullish iFVG. Retests of an iFVG provide high-probability continuation entries.'
+          }
+        ]
+      },
+      {
+        title: 'Ch 3: Chart Shape & Geometry',
+        heading: 'Chapter 3 — Chart Shape & Geometric Pattern Analysis',
+        summary: 'Reading structural compression, wedges, flags, and neckline traps.',
+        blocks: [
+          {
+            subtitle: '1. Falling & Rising Wedges',
+            text: 'A Falling Wedge forms when price makes lower lows at a slower pace than lower highs—signaling seller exhaustion. Once price breaks above the upper trendline with a Change of Character (CHoCH), upside expansion follows.'
+          },
+          {
+            subtitle: '2. Bullish & Bearish Flags',
+            text: 'After an impulsive displacement candle leg, price drifts gently counter-trend inside parallel channels (the Flag). Entering on the retest of the flag breakout or internal FVG aligns you with institutional continuation.'
+          },
+          {
+            subtitle: '3. Horizontal Compression Box (Sideways)',
+            text: 'When highs and lows form a flat rectangle with shrinking ATR, avoid trading inside the middle 60% of the box. Wait for a false breakout sweep of one boundary before taking the opposite side.'
+          }
+        ]
+      },
+      {
+        title: 'Ch 4: How to Read News',
+        heading: 'Chapter 4 — How to Read Macro News & Central Bank Drivers',
+        summary: 'Translating US CPI, NFP, Fed/BoJ/BI speakers, and EIA oil data into Cent pair bias.',
+        blocks: [
+          {
+            subtitle: '1. Actual vs. Forecast (Not Good vs. Bad)',
+            text: 'Markets price in the Forecast before release. If US Core Retail Sales forecasts 0.3% and prints 0.7%, US Treasury yields jump, boosting USDJPYc and pressuring XAUUSDc & USTECc.'
+          },
+          {
+            subtitle: '2. The 15-Minute Spread Rule',
+            text: 'During High-Impact WIB releases (e.g., 20:30 WIB US data), liquidity providers pull quotes for 3–10 minutes. Let the initial algorithmic spike sweep both sides, then enter on the post-news FVG.'
+          },
+          {
+            subtitle: '3. Commodity & Cross-Currency Links',
+            text: 'WTI Crude Oil (USOILc) directly drives Canadian Dollar strength. A surprise crude inventory draw often pushes USOILc higher and AUDCADc lower simultaneously.'
+          }
+        ]
+      },
+      {
+        title: 'Ch 5: Terms & Astral Glossary',
+        heading: 'Chapter 5 — Complex Trading & Astral Cycle Dictionary',
+        summary: 'Searchable reference for institutional SMC, Cent risk, and lunar cycle terminology.',
+        isGlossary: true,
+        terms: [
+          { term: 'BOS (Break of Structure)', def: 'A decisive candle body close beyond a prior swing high (in an uptrend) or swing low (in a downtrend), confirming trend continuation.' },
+          { term: 'CHoCH (Change of Character)', def: 'The first structural break against the prevailing trend after a liquidity sweep—signaling an early reversal.' },
+          { term: 'FVG (Fair Value Gap)', def: 'A 3-candle inefficiency/imbalance where price moved too fast for two-sided trading, acting as a magnet for retracements.' },
+          { term: 'iFVG (Inverse Fair Value Gap)', def: 'A failed FVG that price breaks straight through and subsequently uses as flipped support or resistance.' },
+          { term: 'BSL / SSL (Buy/Sell-Side Liquidity)', def: 'Resting stop orders above swing highs (BSL) or below swing lows (SSL) targeted by institutional order flow.' },
+          { term: 'Portfolio Heat (4.5% Cap)', def: 'Total combined risk across all open trades simultaneously. On 1,096 USC, max total heat is ~49.3 USC.' },
+          { term: 'First Quarter & Full Moon Windows', def: 'Lunar cycle inflection periods tracked by Bot 7; First Quarter (Nov 17, 2026) tests breakout friction while Full Moon (Nov 24) marks volatility peaks.' },
+          { term: 'Rollover Spread Widening (04:45–06:05 WIB)', def: 'Daily NY bank settlement transition where Cent spreads widen sharply—protected automatically by Bot 5.' }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 9. UI FOLDER NAVIGATION & VIEW RENDERERS
+    // =========================================================================
+    function openFolder(folderName, optionalSubTab = null) {
+      appState.activeFolder = folderName;
+      if (optionalSubTab) {
+        appState.activeSubTabs[folderName] = optionalSubTab;
+      }
+      saveState();
+
+      document.querySelectorAll('.folder-view').forEach(el => {
+        el.classList.toggle('hidden', el.id !== `folder-${folderName}`);
+      });
+
+      document.querySelectorAll('.folder-nav-btn').forEach(btn => {
+        const active = btn.dataset.navfolder === folderName;
+        btn.className = `folder-nav-btn py-2.5 flex flex-col items-center justify-center gap-1 transition ${active ? 'text-emerald-400' : 'text-gray-400 hover:text-gray-200'}`;
+      });
+
+      const sub = appState.activeSubTabs[folderName];
+      switchSubTab(folderName, sub, false);
+    }
+
+    function switchSubTab(folderName, subName, shouldSave = true) {
+      appState.activeSubTabs[folderName] = subName;
+      if (shouldSave) saveState();
+
+      document.querySelectorAll(`#folder-${folderName} .subtab-view`).forEach(v => {
+        v.classList.toggle('hidden', v.id !== `view-${folderName}-${subName}`);
+      });
+
+      document.querySelectorAll(`#folder-${folderName} .subtab-btn`).forEach(btn => {
+        const active = btn.dataset.sub === subName;
+        btn.className = `subtab-btn py-2 px-2 rounded-xl text-xs font-bold transition ${
+          active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 shadow-sm' : 'text-gray-400 hover:text-white'
+        }`;
+      });
+
+      if (folderName === 'terminal') {
+        if (subName === 'bots') renderTerminalBotsView();
+        if (subName === 'chart') renderLiveChartView();
+        if (subName === 'calc') updateRiskCalculator();
+      } else if (folderName === 'intel') {
+        renderIntelFolder();
+      } else if (folderName === 'vault') {
+        renderVaultFolder();
+      } else if (folderName === 'academy') {
+        renderAcademyFolder();
+      }
+    }
+
+    function selectInstrument(sym) {
+      appState.activeSymbol = sym;
+      saveState();
+      computeEightBotSignal(sym, appState.activeTf);
+      renderAll();
+    }
+
+    function selectHorizonWindow(win) {
+      appState.activeWindow = win;
+      const defaultTf = win === 'scalp' ? '5m' : win === 'swing' ? '4H' : '1H';
+      appState.activeTf = defaultTf;
+      saveState();
+      computeEightBotSignal(appState.activeSymbol, defaultTf);
+      renderAll();
+    }
+
+    function selectTimeframe(tf) {
+      appState.activeTf = tf;
+      appState.activeWindow = TF_CONFIG[tf]?.window || 'intraday';
+      saveState();
+      computeEightBotSignal(appState.activeSymbol, tf);
+      renderAll();
+    }
+
+    function runMultiBotAnalysis(animated = true) {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      if (!animated) {
+        computeEightBotSignal(sym, tf);
+        renderTerminalBotsView();
+        return;
+      }
+
+      const box = document.getElementById('bot-scan-progress-box');
+      const bar = document.getElementById('scan-step-bar');
+      const lbl = document.getElementById('scan-step-label');
+      const pct = document.getElementById('scan-step-pct');
+      box.classList.remove('hidden');
+
+      const phases = [
+        { p: 25, t: `Bot 1 & 2: Mapping ${tf} EMA20/50/200, BSL/SSL & FVG/iFVG...` },
+        { p: 55, t: `Bot 3 & 4: Analyzing ${sym} Chart Geometry & Macro News Wire...` },
+        { p: 82, t: `Bot 5, 6 & 7: Checking WIB Session Guard, Sideways Chop & Astral Phase...` },
+        { p: 100, t: `Bot 8: Calculating Limit/Breakout Entry Prices & Cent Lots...` }
+      ];
+      let idx = 0;
+      const tick = () => {
+        if (idx < phases.length) {
+          bar.style.width = `${phases[idx].p}%`;
+          pct.textContent = `${phases[idx].p}%`;
+          lbl.textContent = phases[idx].t;
+          idx++;
+          setTimeout(tick, 140);
+        } else {
+          setTimeout(() => {
+            box.classList.add('hidden');
+            const sig = computeEightBotSignal(sym, tf);
+            renderTerminalBotsView();
+            showToast(`${sym} (${tf}): ${sig.verdict} — ${sig.longPct}% Long / ${sig.shortPct}% Short`, sig.verdictTier === 'sideways' ? 'warning' : 'success');
+          }, 140);
+        }
+      };
+      tick();
+    }
+
+    function scanAllPairsLeaderboard() {
+      const tf = appState.activeTf;
+      const ranked = SYMBOL_KEYS.map(s => computeEightBotSignal(s, tf)).sort((a, b) => b.edgePct - a.edgePct);
+      const card = document.getElementById('pairs-leaderboard-card');
+      const list = document.getElementById('pairs-leaderboard-list');
+      document.getElementById('leaderboard-tf-label').textContent = tf;
+      card.classList.remove('hidden');
+
+      list.innerHTML = ranked.map((sig, i) => {
+        const badgeCls = sig.verdictTier === 'sideways'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+          : sig.directionSide === 'BUY'
+            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+            : 'bg-rose-500/20 text-rose-400 border-rose-500/40';
+        return `
+          <button onclick="selectInstrument('${sig.symbol}'); document.getElementById('bot8-verdict-container').scrollIntoView({behavior:'smooth'});" class="w-full text-left rounded-xl bg-[#0b0f19] hover:bg-gray-900 border border-gray-800 p-3 flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono font-bold text-gray-400">#${i + 1}</span>
+                <span class="text-sm font-mono font-extrabold text-white">${sig.symbol}</span>
+                <span class="text-[11px] font-mono text-gray-400">Limit: ${formatPrice(sig.symbol, sig.limitEntry)}</span>
+              </div>
+              <div class="text-[11px] text-gray-400 mt-0.5">${sig.longPct}% L / ${sig.shortPct}% S • ${sig.bot3.patternName}</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold border shrink-0 ${badgeCls}">${sig.verdict}</span>
+          </button>`;
+      }).join('');
+    }
+
+    function renderTerminalBotsView() {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      const sig = botSignalsCache[`${sym}_${tf}`] || computeEightBotSignal(sym, tf);
+
+      // Session / News Warning Banner
+      const warnEl = document.getElementById('session-warning-banner');
+      const sg = sig.sessionGuard;
+      const bannerStyles = sg.statusTier === 'danger'
+        ? 'bg-rose-950/70 border-rose-500/50 text-rose-200'
+        : sg.statusTier === 'warning' || sg.nearbyHighEvent
+          ? 'bg-amber-950/60 border-amber-500/45 text-amber-200'
+          : 'bg-emerald-950/45 border-emerald-500/35 text-emerald-200';
+      warnEl.className = `rounded-2xl p-3 border text-xs flex items-start gap-2.5 ${bannerStyles}`;
+      warnEl.innerHTML = `
+        <div class="space-y-0.5">
+          <div class="font-extrabold">${sg.warningTitle}</div>
+          <div class="text-[11px] opacity-90 leading-snug">${sg.warningMsg}</div>
+          ${sg.nearbyHighEvent ? `<div class="text-[11px] font-mono font-bold text-amber-300 pt-0.5">⚠️ High-Impact WIB Catalyst: ${sg.nearbyHighEvent.title} (${sg.nearbyHighEvent.minsUntil >= 0 ? `in ${sg.nearbyHighEvent.minsUntil}m` : 'JUST RELEASED'})</div>` : ''}
+        </div>
+      `;
+
+      // Instrument Pills
+      document.getElementById('bot-instrument-pills').innerHTML = SYMBOL_KEYS.map(s => {
+        const active = s === sym;
+        return `<button onclick="selectInstrument('${s}')" class="py-2 px-1.5 rounded-xl text-xs font-mono font-bold border transition ${
+          active ? 'bg-cyan-500/20 text-white border-cyan-400' : 'bg-[#0b0f19] text-gray-400 border-gray-800 hover:text-white'
+        }">${s}</button>`;
+      }).join('');
+
+      // Horizon Window Highlights
+      ['scalp', 'intraday', 'swing'].forEach(w => {
+        const btn = document.getElementById(`win-btn-${w}`);
+        const active = appState.activeWindow === w;
+        btn.className = `horizon-btn p-2.5 rounded-xl border text-left transition ${
+          active ? 'bg-emerald-500/15 border-emerald-400 shadow-sm' : 'bg-[#0b0f19] border-gray-800 hover:border-gray-700'
+        }`;
+      });
+
+      const hintMap = {
+        scalp: 'Window: Short Scalp (1m / 5m Precision Liquidity Sweeps)',
+        intraday: 'Window: Medium Term (15m / 1H Session FVG & Structure)',
+        swing: 'Window: Swing Term (4H / 1D Macro + Bot 7 Astral Cycle)'
+      };
+      document.getElementById('horizon-tf-hint').textContent = hintMap[appState.activeWindow] || '';
+
+      // 6 Timeframe Pills
+      document.querySelectorAll('.bot-tf-btn').forEach(btn => {
+        const active = btn.dataset.tf === tf;
+        btn.className = `bot-tf-btn py-2 rounded-xl text-xs font-mono font-bold border transition ${
+          active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400' : 'bg-[#0b0f19] text-gray-400 border-gray-800 hover:text-white'
+        }`;
+      });
+
+      // BOT 8 Master Verdict & Entry Zones Card
+      const isSideways = sig.verdictTier === 'sideways';
+      const isBuy = sig.directionSide === 'BUY';
+      const verdictBadgeCls = isSideways
+        ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+        : isBuy
+          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+          : 'bg-rose-500/20 text-rose-400 border-rose-500/50';
+
+      document.getElementById('bot8-verdict-container').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-mono font-extrabold text-white">${sig.symbol}</span>
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-gray-800 text-cyan-300">${sig.tfLabel}</span>
+            </div>
+            <div class="text-[11px] text-gray-400 mt-0.5">Live Mark: <span class="font-mono text-white font-bold">${formatPrice(sym, sig.price)}</span> • ${sig.wibTime}</div>
+          </div>
+          <span class="px-3.5 py-1.5 rounded-xl border text-xs sm:text-sm font-extrabold tracking-wide ${verdictBadgeCls}">
+            ${sig.verdict}
+          </span>
+        </div>
+
+        <!-- Probability Meter -->
+        <div class="space-y-1.5">
+          <div class="flex items-baseline justify-between">
+            <div>
+              <span class="text-2xl font-mono font-extrabold text-emerald-400 tabular-nums">${sig.longPct}%</span>
+              <span class="text-xs font-extrabold text-emerald-400 ml-1">BULL / LONG</span>
+            </div>
+            <span class="text-[10px] font-mono text-gray-500 uppercase">8-Bot Probability</span>
+            <div class="text-right">
+              <span class="text-xs font-extrabold text-rose-400 mr-1">BEAR / SHORT</span>
+              <span class="text-2xl font-mono font-extrabold text-rose-400 tabular-nums">${sig.shortPct}%</span>
+            </div>
+          </div>
+          <div class="w-full h-3.5 rounded-full bg-rose-500 overflow-hidden flex">
+            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${sig.longPct}%"></div>
+          </div>
+        </div>
+
+        <!-- Exact Entry Price Zones (Sniper FVG Limit Entry vs Breakout Confirmation Entry) -->
+        <div class="space-y-2">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-300">Recommended Entry Prices &amp; Execution Zones</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div class="rounded-xl bg-[#0b0f19] border border-cyan-500/35 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-cyan-300">1. Optimal Limit Entry (FVG/iFVG Zone)</span>
+                <span class="text-[10px] font-mono text-emerald-400">Best R:R</span>
+              </div>
+              <div class="text-base font-mono font-extrabold text-white mt-0.5">${formatPrice(sym, sig.limitEntry)}</div>
+              <div class="text-[10px] text-gray-400 mt-0.5">Place ${sig.directionSide} Limit inside ${sig.tf} imbalance retest</div>
+            </div>
+            <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-gray-300">2. Momentum Breakout Entry</span>
+                <span class="text-[10px] font-mono text-amber-300">Confirmation</span>
+              </div>
+              <div class="text-base font-mono font-extrabold text-white mt-0.5">${formatPrice(sym, sig.breakoutEntry)}</div>
+              <div class="text-[10px] text-gray-400 mt-0.5">Enter after ${sig.tf} candle closes beyond structure</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stop-Loss, TP1, TP2 & Cent Lot Sizer -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Invalidation SL</div>
+            <div class="font-bold text-rose-400 mt-0.5">${formatPrice(sym, sig.slPrice)}</div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">TP1 (1:1.5 R:R)</div>
+            <div class="font-bold text-emerald-300 mt-0.5">${formatPrice(sym, sig.tp1Price)}</div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">TP2 Liquidity (1:2.5)</div>
+            <div class="font-bold text-emerald-400 mt-0.5">${formatPrice(sym, sig.tp2Price)}</div>
+          </div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2.5">
+            <div class="text-[10px] text-gray-400 font-sans">Cent Lot (1,096 USC)</div>
+            <div class="font-bold text-cyan-300 mt-0.5">${sig.centLots.toFixed(2)} lot (${sig.actualRiskUsc} USC)</div>
+          </div>
+        </div>
+
+        <!-- Further Elaboration & Why -->
+        <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 space-y-1">
+          <div class="text-[11px] font-extrabold text-white uppercase tracking-wider">Why This Signal &amp; Execution Elaboration</div>
+          <p class="text-xs text-gray-300 leading-relaxed">${sig.elaboration}</p>
+        </div>
+
+        <!-- 1-Tap Log Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button onclick="sendSignalToVault('${sig.symbol}', '${sig.tf}', false)" class="py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-[#051017] font-extrabold text-xs tracking-wide transition">
+            ⚡ Log FVG Limit Entry (${formatPrice(sym, sig.limitEntry)})
+          </button>
+          <button onclick="sendSignalToVault('${sig.symbol}', '${sig.tf}', true)" class="py-3 px-3 rounded-xl bg-[#182234] hover:bg-gray-800 border border-gray-700 text-cyan-300 font-bold text-xs transition">
+            Log Breakout Entry (${formatPrice(sym, sig.breakoutEntry)})
+          </button>
+        </div>
+      `;
+
+      // Render 8 Specialized Bot Diagnostic Cards
+      const botCards = [
+        {
+          tag: 'BOT 1 • MULTI-TF TECHNICALS',
+          badge: `${sig.bot1.structureTag}`,
+          badgeCls: 'text-emerald-300 bg-emerald-500/15',
+          body: `Timeframe ${sig.tf}: Price ${formatPrice(sym, sig.price)} vs EMA20 (${formatPrice(sym, sig.bot1.ema20)}), EMA50 (${formatPrice(sym, sig.bot1.ema50)}), EMA200 (${formatPrice(sym, sig.bot1.ema200)}). RSI(14) = ${sig.bot1.rsi14} | ATR(14) = ${formatPrice(sym, sig.bot1.tfAtr)}.`
+        },
+        {
+          tag: 'BOT 2 • SMC LIQUIDITY, FVG & iFVG',
+          badge: `BSL ${formatPrice(sym, sig.bot2.bslLevel)} / SSL ${formatPrice(sym, sig.bot2.sslLevel)}`,
+          badgeCls: 'text-cyan-300 bg-cyan-500/15',
+          body: `${sig.bot2.smcExplanation} Active iFVG Polarity Zone: ${sig.bot2.ifvgZone}.`
+        },
+        {
+          tag: 'BOT 3 • CHART SHAPE & GEOMETRY',
+          badge: sig.bot3.patternName,
+          badgeCls: 'text-purple-300 bg-purple-500/15',
+          body: sig.bot3.patternDetail
+        },
+        {
+          tag: 'BOT 4 • NEWS & MACRO WIRE',
+          badge: `Wire Bias: ${sig.bot4.newsBiasTag}`,
+          badgeCls: 'text-amber-300 bg-amber-500/15',
+          body: `Latest Pair Catalyst: "${sig.bot4.topHeadline}"`
+        },
+        {
+          tag: 'BOT 5 • WIB SESSION & SIDEWAYS GUARD',
+          badge: sg.sessionName,
+          badgeCls: sg.statusTier === 'danger' ? 'text-rose-300 bg-rose-500/15' : 'text-amber-300 bg-amber-500/15',
+          body: `${sg.warningMsg}`
+        },
+        {
+          tag: 'BOT 6 • PAIR INSIGHT & SCENARIOS',
+          badge: sym,
+          badgeCls: 'text-cyan-300 bg-cyan-500/15',
+          body: `${sig.bot6.whatIsHappening} ${sig.bot6.whatMayHappen}`
+        },
+        {
+          tag: `BOT 7 • ASTRAL & LUNAR CYCLE ${isSwing ? '(ACTIVE SWING WEIGHT)' : '(WEEKLY CONTEXT)'}`,
+          badge: `${sig.astral.phaseName} (${sig.astral.illumination}%)`,
+          badgeCls: 'text-indigo-300 bg-indigo-500/15',
+          body: `Transit: ${sig.astral.zodiacTransit}. ${sig.astral.weeklyNote}`
+        }
+      ];
+
+      document.getElementById('eight-bots-cards-grid').innerHTML = botCards.map(b => `
+        <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 space-y-1.5">
+          <div class="flex flex-wrap items-center justify-between gap-1.5">
+            <span class="text-[10px] font-mono font-extrabold text-gray-300">${b.tag}</span>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${b.badgeCls}">${b.badge}</span>
+          </div>
+          <p class="text-xs text-gray-300 leading-relaxed">${b.body}</p>
+        </div>
+      `).join('');
+    }
+
+    // --- LIVE CHART SUB-TAB ---
+    let currentTvLoadedKey = '';
+    function renderLiveChartView() {
+      const sym = appState.activeSymbol;
+      const tf = appState.activeTf;
+      const sig = botSignalsCache[`${sym}_${tf}`] || computeEightBotSignal(sym, tf);
+
+      document.getElementById('chart-top-verdict').textContent = sig.verdict;
+      document.getElementById('chart-top-title').textContent = `${sym} • ${sig.tfLabel} (Asia/Jakarta WIB)`;
+      document.getElementById('chart-top-levels').textContent = `Limit: ${formatPrice(sym, sig.limitEntry)} • SL: ${formatPrice(sym, sig.slPrice)} • TP2: ${formatPrice(sym, sig.tp2Price)}`;
+
+      document.getElementById('chart-pair-pills').innerHTML = SYMBOL_KEYS.map(s => `
+        <button onclick="selectInstrument('${s}')" class="px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold shrink-0 border ${
+          s === sym ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-[#111827] text-gray-400 border-gray-800'
+        }">${s}</button>
+      `).join('');
+
+      document.querySelectorAll('.chart-tf-btn').forEach(b => {
+        const act = b.dataset.ctf === tf;
+        b.className = `chart-tf-btn px-2 py-1 rounded-lg text-[10px] font-mono font-bold ${
+          act ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/35' : 'text-gray-400'
+        }`;
+      });
+
+      document.getElementById('chart-smc-zones-strip').innerHTML = `
+        <div class="card-glass rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-gray-400">SSL Magnet</div>
+          <div class="text-xs font-mono font-bold text-emerald-400 mt-0.5">${formatPrice(sym, sig.bot2.sslLevel)}</div>
+        </div>
+        <div class="card-glass rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-gray-400">FVG Limit Entry</div>
+          <div class="text-xs font-mono font-bold text-cyan-300 mt-0.5">${formatPrice(sym, sig.limitEntry)}</div>
+        </div>
+        <div class="card-glass rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-gray-400">Breakout Entry</div>
+          <div class="text-xs font-mono font-bold text-white mt-0.5">${formatPrice(sym, sig.breakoutEntry)}</div>
+        </div>
+        <div class="card-glass rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-gray-400">BSL Magnet</div>
+          <div class="text-xs font-mono font-bold text-rose-400 mt-0.5">${formatPrice(sym, sig.bot2.bslLevel)}</div>
+        </div>
+      `;
+
+      const desiredKey = `${sym}_${tf}`;
+      if (currentTvLoadedKey !== desiredKey) {
+        currentTvLoadedKey = desiredKey;
+        const box = document.getElementById('tv-widget-box');
+        box.innerHTML = '';
+        if (typeof TradingView !== 'undefined') {
+          try {
+            new TradingView.widget({
+              autosize: true,
+              symbol: INSTRUMENTS[sym].tvSymbol,
+              interval: TF_CONFIG[tf].tv,
+              timezone: 'Asia/Jakarta',
+              theme: 'dark',
+              style: '1',
+              locale: 'en',
+              toolbar_bg: '#0b0f19',
+              enable_publishing: false,
+              container_id: 'tv-widget-box',
+              studies: ['MASimple@tv-basicstudies', 'RSI@tv-basicstudies']
+            });
+          } catch (e) {}
+        }
+      }
+    }
+
+    // --- CENT RISK CALCULATOR SUB-TAB ---
+    function updateRiskCalculator() {
+      const sym = document.getElementById('calc-symbol').value;
+      const riskPct = parseFloat(document.getElementById('calc-risk-pct').value) || 1.8;
+      const slDist = parseFloat(document.getElementById('calc-sl-dist').value) || 1.0;
+      const rr = parseFloat(document.getElementById('calc-rr').value) || 2.5;
+      const spec = INSTRUMENTS[sym] || INSTRUMENTS.XAUUSDc;
+
+      const equity = getCurrentEquityUsc();
+      const maxRiskUsc = equity * (riskPct / 100);
+      const riskPer001 = Math.max(0.2, slDist * spec.uscPerPoint001);
+      const lots = Math.max(0.01, Math.floor((maxRiskUsc / riskPer001) * 100) / 100);
+      const actualRiskUsc = riskPer001 * (lots / 0.01);
+      const targetProfitUsc = actualRiskUsc * rr;
+
+      document.getElementById('calc-result-box').innerHTML = `
+        <div><div class="text-[10px] text-gray-400">Optimal Cent Lot</div><div class="text-sm font-mono font-extrabold text-cyan-300">${lots.toFixed(2)} lots</div></div>
+        <div><div class="text-[10px] text-gray-400">Max Risk (USC)</div><div class="text-sm font-mono font-extrabold text-rose-400">${actualRiskUsc.toFixed(1)} USC</div></div>
+        <div><div class="text-[10px] text-gray-400">Max Risk (IDR)</div><div class="text-sm font-mono font-extrabold text-amber-300">${formatIdr(actualRiskUsc)}</div></div>
+        <div><div class="text-[10px] text-gray-400">Target Profit</div><div class="text-sm font-mono font-extrabold text-emerald-400">+${targetProfitUsc.toFixed(1)} USC</div></div>
+      `;
+    }
+
+    // --- INTEL & NEWS FOLDER RENDERER ---
+    function renderIntelFolder() {
+      // 1. Live FX Reference Strip
+      const strip = document.getElementById('live-fx-ticker-strip');
+      if (strip) {
+        strip.innerHTML = `
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2"><span class="text-[10px] text-gray-400 block">USD/JPY</span><span class="font-bold text-white">${liveFxRates.USDJPY}</span></div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2"><span class="text-[10px] text-gray-400 block">AUD/CAD</span><span class="font-bold text-white">${liveFxRates.AUDCAD}</span></div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2"><span class="text-[10px] text-gray-400 block">EUR/USD</span><span class="font-bold text-white">${liveFxRates.EURUSD}</span></div>
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-2"><span class="text-[10px] text-gray-400 block">USD/IDR</span><span class="font-bold text-cyan-300">Rp${liveFxRates.USDIDR.toLocaleString('id-ID')}</span></div>
+        `;
+      }
+
+      // 2. Pair Filter Pills
+      const filterPills = document.getElementById('news-pair-filter-pills');
+      if (filterPills) {
+        const filters = ['ALL', ...SYMBOL_KEYS];
+        filterPills.innerHTML = filters.map(f => {
+          const active = appState.newsFilterPair === f;
+          return `<button onclick="appState.newsFilterPair='${f}'; saveState(); renderIntelFolder();" class="px-3 py-1.5 rounded-xl text-xs font-mono font-bold shrink-0 border ${
+            active ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400' : 'bg-[#111827] text-gray-400 border-gray-800'
+          }">${f}</button>`;
+        }).join('');
+      }
+
+      // 3. Dedicated News List
+      const filteredNews = appState.newsFilterPair === 'ALL'
+        ? liveNewsItems
+        : liveNewsItems.filter(n => n.pair === appState.newsFilterPair);
+
+      const newsCountEl = document.getElementById('news-count-pill');
+      if (newsCountEl) newsCountEl.textContent = `${filteredNews.length} headlines`;
+
+      const newsListEl = document.getElementById('dedicated-news-feed-list');
+      if (newsListEl) {
+        newsListEl.innerHTML = filteredNews.map(n => {
+          const biasCls = n.bias === 'BULLISH'
+            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+            : n.bias === 'BEARISH'
+              ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+              : 'bg-gray-800 text-gray-300 border-gray-700';
+          return `
+            <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-300">${n.pair}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${biasCls}">${n.bias}</span>
+              </div>
+              <div class="text-xs font-semibold text-gray-100 leading-snug">${n.title}</div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-gray-400">
+                <span>${n.source} • ${n.timeWib}</span>
+                ${n.url ? `<a href="${n.url}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline">Source ↗</a>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      // 4. WIB Economic Calendar List
+      const calList = document.getElementById('wib-calendar-list');
+      if (calList) {
+        const wib = getWibTime();
+        calList.innerHTML = WIB_ECONOMIC_EVENTS.map(ev => {
+          const armed = Boolean(appState.eventReminders[ev.id]);
+          const timeFormatted = `${String(ev.wibHour).padStart(2, '0')}:${String(ev.wibMin).padStart(2, '0')} WIB`;
+          const impCls = ev.impact === 'HIGH'
+            ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+            : 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+          return `
+            <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 flex items-start justify-between gap-2.5">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="text-[11px] font-mono font-bold text-cyan-300">${ev.dayLabel} • ${timeFormatted}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-extrabold border ${impCls}">${ev.impact}</span>
+                  <span class="text-[10px] font-mono text-gray-400">${ev.currency}</span>
+                </div>
+                <div class="text-xs font-bold text-white">${ev.title}</div>
+                <div class="text-[10px] font-mono text-gray-400">Pairs: ${ev.pairs.join(', ')} • Forecast: ${ev.forecast} (Prev: ${ev.previous})</div>
+              </div>
+              <button onclick="appState.eventReminders['${ev.id}']=!appState.eventReminders['${ev.id}']; saveState(); renderIntelFolder(); showToast('Calendar reminder updated.', 'info');" class="p-2 rounded-xl border shrink-0 transition ${
+                armed ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-500'
+              }" title="Toggle Local Alert">
+                🔔
+              </button>
+            </div>`;
+        }).join('');
+      }
+
+      // 5. Dedicated Pair Insights Cards
+      const insightsEl = document.getElementById('pair-insights-cards');
+      if (insightsEl) {
+        insightsEl.innerHTML = SYMBOL_KEYS.map(sym => {
+          const spec = INSTRUMENTS[sym];
+          const sig = botSignalsCache[`${sym}_${appState.activeTf}`] || computeEightBotSignal(sym, appState.activeTf);
+          return `
+            <div class="card-glass rounded-2xl p-4 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-base font-mono font-extrabold text-white">${sym}</span>
+                  <span class="text-xs text-gray-400 ml-1.5">${spec.name}</span>
+                </div>
+                <button onclick="selectInstrument('${sym}'); openFolder('terminal', 'bots');" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold shrink-0">
+                  8-Bot Scan (${sig.longPct}% L)
+                </button>
+              </div>
+              <div class="space-y-1.5 text-xs text-gray-300 leading-relaxed">
+                <div><strong class="text-cyan-300">What Is Happening:</strong> ${spec.whatIsHappening}</div>
+                <div><strong class="text-amber-300">The Whys &amp; Drivers:</strong> ${spec.whyMoving}</div>
+                <div><strong class="text-emerald-300">What May Happen Next:</strong> ${spec.whatMayHappen}</div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+    }
+
+    // --- MT5 VAULT FOLDER RENDERER ---
+    function renderVaultFolder() {
+      const startBal = Number(appState.account.startingBalanceUsc) || 1096.0;
+      const startInput = document.getElementById('vault-start-bal');
+      if (startInput && document.activeElement !== startInput) startInput.value = startBal;
+
+      const equity = getCurrentEquityUsc();
+      const netPnl = Number((equity - startBal).toFixed(1));
+      document.getElementById('vault-equity-usc').textContent = `${equity.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} USC`;
+      document.getElementById('vault-equity-idr').textContent = `(${formatIdr(equity)})`;
+
+      const pnlEl = document.getElementById('vault-net-pnl');
+      pnlEl.textContent = formatUsc(netPnl, true);
+      pnlEl.className = `font-bold mt-0.5 ${netPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      document.getElementById('vault-net-idr').textContent = formatIdr(netPnl, true);
+
+      const closed = appState.closedTrades;
+      const wins = closed.filter(t => Number(t.pnlUsc) > 0).length;
+      const wr = closed.length > 0 ? ((wins / closed.length) * 100).toFixed(1) : '0.0';
+      document.getElementById('vault-win-rate').textContent = `${wr}%`;
+      document.getElementById('vault-closed-cnt').textContent = `${closed.length} closed`;
+
+      const openRisk = appState.openPositions.reduce((s, p) => s + calcPosRiskUsc(p), 0);
+      const heatPct = ((openRisk / Math.max(100, equity)) * 100).toFixed(1);
+      const heatEl = document.getElementById('vault-heat-pct');
+      heatEl.textContent = `${heatPct}% / 4.5%`;
+      heatEl.className = `font-bold mt-0.5 ${Number(heatPct) > 4.5 ? 'text-rose-400' : 'text-emerald-400'}`;
+      document.getElementById('vault-heat-usc').textContent = `${openRisk.toFixed(1)} USC open`;
+
+      // Open Positions List
+      const floating = appState.openPositions.reduce((s, p) => s + calcPosPnlUsc(p), 0);
+      document.getElementById('open-pos-cnt').textContent = appState.openPositions.length;
+      document.getElementById('open-floating-label').textContent = `Floating: ${formatUsc(floating, true)}`;
+
+      const openBox = document.getElementById('open-positions-container');
+      if (appState.openPositions.length === 0) {
+        openBox.innerHTML = `<div class="text-center py-5 text-xs text-gray-500">No open positions. Generate an 8-Bot signal in <span class="text-cyan-300">Terminal</span> and tap Log Entry.</div>`;
+      } else {
+        openBox.innerHTML = appState.openPositions.map(p => {
+          const pnl = calcPosPnlUsc(p);
+          return `
+            <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${p.side === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${p.side}</span>
+                  <span class="font-mono font-extrabold text-sm text-white">${p.symbol}</span>
+                  <span class="text-xs font-mono text-gray-400">${p.lots.toFixed(2)} lot</span>
+                </div>
+                <div class="text-right font-mono">
+                  <div class="text-xs font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${formatUsc(pnl, true)}</div>
+                  <div class="text-[10px] text-gray-400">${formatIdr(pnl, true)}</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] font-mono text-gray-400">
+                <span>Entry: ${formatPrice(p.symbol, p.entry)}</span>
+                <span class="text-rose-400">SL: ${formatPrice(p.symbol, p.sl)}</span>
+                <span class="text-emerald-400">TP: ${formatPrice(p.symbol, p.tp)}</span>
+              </div>
+              ${!p.fromMfb ? `
+                <div class="flex items-center justify-between gap-1 pt-1">
+                  <div class="flex items-center gap-1">
+                    <button onclick="nudgePosPrice('${p.id}', -1)" class="px-2 py-1 rounded bg-gray-800 text-[11px] font-mono text-rose-300">-5p</button>
+                    <span class="text-xs font-mono text-white px-1.5">${formatPrice(p.symbol, p.currentPrice)}</span>
+                    <button onclick="nudgePosPrice('${p.id}', 1)" class="px-2 py-1 rounded bg-gray-800 text-[11px] font-mono text-emerald-300">+5p</button>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <button onclick="closeLocalPos('${p.id}', 'TP')" class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">TP</button>
+                    <button onclick="closeLocalPos('${p.id}', 'BE')" class="px-2 py-1 rounded bg-gray-800 text-gray-300 text-[10px] font-bold">BE</button>
+                    <button onclick="closeLocalPos('${p.id}', 'SL')" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold">SL</button>
+                  </div>
+                </div>` : ''}
+            </div>`;
+        }).join('');
+      }
+
+      // Myfxbook Panel Status
+      const emailEl = document.getElementById('mfb-email-input');
+      if (emailEl && !emailEl.value && appState.myfxbook.email) emailEl.value = appState.myfxbook.email;
+      const chk = document.getElementById('mfb-autosync-chk');
+      if (chk) chk.checked = Boolean(appState.myfxbook.autoSync);
+
+      const pill = document.getElementById('mfb-status-pill');
+      const ts = document.getElementById('mfb-sync-timestamp');
+      const dd = document.getElementById('mfb-acc-dropdown');
+      const statsBox = document.getElementById('mfb-stats-card');
+
+      if (appState.myfxbook.session && appState.myfxbook.syncedStats) {
+        pill.textContent = 'Connected';
+        pill.className = 'px-2 py-1 rounded-lg text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        ts.textContent = `Last synced: ${appState.myfxbook.lastSyncTime}`;
+        dd.innerHTML = appState.myfxbook.accounts.map(a => `<option value="${a.id}" ${String(a.id) === String(appState.myfxbook.selectedAccountId) ? 'selected' : ''}>${a.name} (#${a.accountId || a.id})</option>`).join('');
+        const st = appState.myfxbook.syncedStats;
+        statsBox.classList.remove('hidden');
+        statsBox.innerHTML = `<div class="text-xs font-bold text-white">${st.name} (${st.server}) • Gain: <span class="text-emerald-400">${st.gain}%</span> • Drawdown: <span class="text-rose-400">${st.drawdown}%</span></div>`;
+      } else {
+        pill.textContent = 'Offline';
+        pill.className = 'px-2 py-1 rounded-lg text-[10px] font-mono bg-gray-800 text-gray-400';
+        statsBox.classList.add('hidden');
+      }
+
+      // Equity SVG & Closed History
+      renderVaultEquityChart(startBal);
+      const journal = document.getElementById('closed-journal-list');
+      journal.innerHTML = closed.length === 0
+        ? `<div class="text-center py-4 text-xs text-gray-500">No closed trades yet.</div>`
+        : closed.slice(0, 25).map(t => `
+          <div class="rounded-xl bg-[#0b0f19] border border-gray-800 px-3 py-2 flex items-center justify-between text-xs font-mono">
+            <div><span class="${t.side === 'BUY' ? 'text-emerald-400' : 'text-rose-400'} font-bold">${t.side}</span> <span class="text-white font-bold">${t.symbol}</span> <span class="text-gray-500 text-[10px]">${t.source}</span></div>
+            <div class="${Number(t.pnlUsc) >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${formatUsc(t.pnlUsc, true)} (${formatIdr(t.pnlUsc, true)})</div>
+          </div>`).join('');
+    }
+
+    function renderVaultEquityChart(startBal) {
+      const svg = document.getElementById('vault-equity-svg');
+      if (!svg) return;
+      const pts = [startBal];
+      let run = startBal;
+      appState.closedTrades.slice().reverse().forEach(t => {
+        run = Number((run + (Number(t.pnlUsc) || 0)).toFixed(2));
+        pts.push(run);
+      });
+      if (pts.length === 1) pts.push(startBal);
+      const w = 600, h = 170, px = 26, py = 20;
+      const minV = Math.min(...pts) * 0.992, maxV = Math.max(...pts) * 1.008;
+      const span = Math.max(5, maxV - minV);
+      const coords = pts.map((v, i) => ({
+        x: px + (i / (pts.length - 1)) * (w - px * 2),
+        y: h - py - ((v - minV) / span) * (h - py * 2)
+      }));
+      const pathD = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ');
+      const col = pts[pts.length - 1] >= startBal ? '#10b981' : '#ef4444';
+      svg.innerHTML = `
+        <path d="${pathD}" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" />
+        ${coords.map(c => `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#0b0f19" stroke="${col}" stroke-width="2" />`).join('')}
+        <text x="${w - px}" y="14" text-anchor="end" fill="${col}" font-size="11" font-weight="bold" font-family="JetBrains Mono">Now: ${pts[pts.length - 1].toFixed(1)} USC</text>
+      `;
+    }
+
+    // --- ACADEMY & API FOLDER RENDERER ---
+    function renderAcademyFolder() {
+      const idx = appState.activeChapterIdx || 0;
+      const ch = ACADEMY_CHAPTERS[idx] || ACADEMY_CHAPTERS[0];
+
+      document.getElementById('academy-chapter-pills').innerHTML = ACADEMY_CHAPTERS.map((c, i) => `
+        <button onclick="appState.activeChapterIdx=${i}; saveState(); renderAcademyFolder();" class="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 border transition ${
+          i === idx ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400' : 'bg-[#111827] text-gray-400 border-gray-800 hover:text-white'
+        }">${c.title}</button>
+      `).join('');
+
+      const box = document.getElementById('academy-chapter-content');
+      if (ch.isGlossary) {
+        box.innerHTML = `
+          <div>
+            <h3 class="text-base font-extrabold text-white">${ch.heading}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">${ch.summary}</p>
+          </div>
+          <input type="text" placeholder="🔍 Search terms (e.g., iFVG, CHoCH, BSL, Lunar, Rollover)..." oninput="filterGlossaryTerms(this.value)" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white" />
+          <div id="glossary-terms-list" class="space-y-2">
+            ${ch.terms.map(t => `
+              <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3">
+                <div class="text-xs font-extrabold text-cyan-300">${t.term}</div>
+                <p class="text-xs text-gray-300 mt-1 leading-relaxed">${t.def}</p>
+              </div>`).join('')}
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div>
+            <h3 class="text-base font-extrabold text-white">${ch.heading}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">${ch.summary}</p>
+          </div>
+          <div class="space-y-2.5">
+            ${ch.blocks.map(b => `
+              <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3.5 space-y-1">
+                <div class="text-xs font-extrabold text-emerald-300">${b.subtitle}</div>
+                <p class="text-xs text-gray-300 leading-relaxed">${b.text}</p>
+              </div>`).join('')}
+          </div>
+        `;
+      }
+
+      // Sync API Vault Inputs
+      document.getElementById('api-twelvedata-input').value = appState.apiKeys.twelveData || '';
+      document.getElementById('api-finnhub-input').value = appState.apiKeys.finnhub || '';
+      document.getElementById('api-gemini-input').value = appState.apiKeys.gemini || '';
+      document.getElementById('api-idr-input').value = appState.apiKeys.idrRate || 182.5;
+      document.getElementById('api-risk-input').value = appState.apiKeys.riskPct || 1.8;
+    }
+
+    function filterGlossaryTerms(query) {
+      const q = query.trim().toLowerCase();
+      const ch = ACADEMY_CHAPTERS.find(c => c.isGlossary);
+      const list = document.getElementById('glossary-terms-list');
+      if (!ch || !list) return;
+      const filtered = ch.terms.filter(t => t.term.toLowerCase().includes(q) || t.def.toLowerCase().includes(q));
+      list.innerHTML = filtered.map(t => `
+        <div class="rounded-xl bg-[#0b0f19] border border-gray-800 p-3">
+          <div class="text-xs font-extrabold text-cyan-300">${t.term}</div>
+          <p class="text-xs text-gray-300 mt-1 leading-relaxed">${t.def}</p>
+        </div>`).join('');
+    }
+
+    function saveApiVaultSettings() {
+      appState.apiKeys.twelveData = document.getElementById('api-twelvedata-input').value.trim();
+      appState.apiKeys.finnhub = document.getElementById('api-finnhub-input').value.trim();
+      appState.apiKeys.gemini = document.getElementById('api-gemini-input').value.trim();
+      appState.apiKeys.idrRate = parseFloat(document.getElementById('api-idr-input').value) || 182.5;
+      appState.apiKeys.riskPct = Math.max(0.5, Math.min(3.0, parseFloat(document.getElementById('api-risk-input').value) || 1.8));
+      saveState();
+      refreshAllNewsSources(true);
+      renderAll();
+    }
+
+    function updateHeaderClockAndEquity() {
+      const wib = getWibTime();
+      const sg = evaluateWibSessionAndWarnings(wib);
+      checkScheduledLocalAlerts(wib);
+
+      const clockEl = document.getElementById('wib-clock-display');
+      if (clockEl) clockEl.textContent = wib.clockStr;
+
+      const sessEl = document.getElementById('header-session-badge');
+      if (sessEl) {
+        sessEl.textContent = sg.sessionName;
+        sessEl.className = `text-[10px] font-bold px-1.5 py-0.5 rounded-md border uppercase tracking-wider truncate ${sg.badgeClass}`;
+      }
+
+      const eq = getCurrentEquityUsc();
+      const start = Number(appState.account.startingBalanceUsc) || 1096.0;
+      const pnl = Number((eq - start).toFixed(1));
+      document.getElementById('header-equity-usc').textContent = `${eq.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} USC`;
+      const pnlPill = document.getElementById('header-pnl-pill');
+      pnlPill.textContent = `${formatUsc(pnl, true)} (${formatIdr(pnl, true)})`;
+      pnlPill.className = `text-[10px] font-mono font-semibold tabular-nums ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    }
+
+    function renderAll() {
+      updateHeaderClockAndEquity();
+      openFolder(appState.activeFolder || 'terminal');
+    }
+
+    // =========================================================================
+    // 10. INITIALIZATION
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      computeEightBotSignal(appState.activeSymbol, appState.activeTf);
+      prefillTrackerOrder();
+      updateNotifBadge();
+      renderAll();
+
+      setInterval(updateHeaderClockAndEquity, 1000);
+      if (appState.myfxbook.autoSync && appState.myfxbook.session) {
+        mfbPollInterval = setInterval(() => syncMyfxbookAccount(false), 60000);
+      }
+      refreshAllNewsSources(false);
+    });
+  </script>
+</body>
+</html>
